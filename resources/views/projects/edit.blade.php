@@ -36,15 +36,28 @@
                         </div>
 
                         <div class="col-span-6 sm:col-span-2">
-                            <label for="code" class="block text-sm font-medium text-gray-700">プロジェクトコード *</label>
-                            <input type="text" name="code" id="code" value="{{ old('code', $project->code) }}" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('code') border-red-300 @enderror">
-                            @error('code')
+                            <label for="health" class="block text-sm font-medium text-gray-700">進捗ヘルス *</label>
+                            <select name="health" id="health" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('health') border-red-300 @enderror">
+                                <option value="Green" {{ old('health', $project->health) == 'Green' ? 'selected' : '' }}>Green（良好）</option>
+                                <option value="Amber" {{ old('health', $project->health) == 'Amber' ? 'selected' : '' }}>Amber（注意）</option>
+                                <option value="Red" {{ old('health', $project->health) == 'Red' ? 'selected' : '' }}>Red（危険）</option>
+                            </select>
+                            @error('health')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="col-span-6 sm:col-span-4">
+                        <div class="col-span-6 sm:col-span-3">
+                            <label for="customer_name" class="block text-sm font-medium text-gray-700">顧客名 *</label>
+                            <input type="text" name="customer_name" id="customer_name" value="{{ old('customer_name', $project->customer_name) }}" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('customer_name') border-red-300 @enderror">
+                            @error('customer_name')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
                             <label for="pm_name" class="block text-sm font-medium text-gray-700">PM名 *</label>
                             <input type="text" name="pm_name" id="pm_name" value="{{ old('pm_name', $project->pm_name) }}" required
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('pm_name') border-red-300 @enderror">
@@ -54,43 +67,99 @@
                         </div>
 
                         <div class="col-span-6 sm:col-span-2">
-                            <label for="status" class="block text-sm font-medium text-gray-700">ステータス *</label>
-                            <select name="status" id="status" required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('status') border-red-300 @enderror">
-                                <option value="planning" {{ old('status', $project->status) == 'planning' ? 'selected' : '' }}>計画</option>
-                                <option value="execution" {{ old('status', $project->status) == 'execution' ? 'selected' : '' }}>実行</option>
-                                <option value="completion" {{ old('status', $project->status) == 'completion' ? 'selected' : '' }}>終結</option>
+                            <label for="priority" class="block text-sm font-medium text-gray-700">優先度 *</label>
+                            <select name="priority" id="priority" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('priority') border-red-300 @enderror">
+                                <option value="High" {{ old('priority', $project->priority) == 'High' ? 'selected' : '' }}>High（高）</option>
+                                <option value="Medium" {{ old('priority', $project->priority) == 'Medium' ? 'selected' : '' }}>Medium（中）</option>
+                                <option value="Low" {{ old('priority', $project->priority) == 'Low' ? 'selected' : '' }}>Low（低）</option>
                             </select>
-                            @error('status')
+                            @error('priority')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="phase" class="block text-sm font-medium text-gray-700">フェーズ *</label>
+                            <select name="phase" id="phase" required
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('phase') border-red-300 @enderror">
+                                <option value="planning" {{ old('phase', $project->phase) == 'planning' ? 'selected' : '' }}>企画</option>
+                                <option value="requirements" {{ old('phase', $project->phase) == 'requirements' ? 'selected' : '' }}>要件</option>
+                                <option value="design" {{ old('phase', $project->phase) == 'design' ? 'selected' : '' }}>設計</option>
+                                <option value="implementation" {{ old('phase', $project->phase) == 'implementation' ? 'selected' : '' }}>実装</option>
+                                <option value="testing" {{ old('phase', $project->phase) == 'testing' ? 'selected' : '' }}>テスト</option>
+                                <option value="release" {{ old('phase', $project->phase) == 'release' ? 'selected' : '' }}>リリース</option>
+                                <option value="operation" {{ old('phase', $project->phase) == 'operation' ? 'selected' : '' }}>運用</option>
+                            </select>
+                            @error('phase')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-2">
+                            <label for="budget" class="block text-sm font-medium text-gray-700">予算</label>
+                            <input type="number" name="budget" id="budget" value="{{ old('budget', $project->budget) }}" step="0.01" min="0"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('budget') border-red-300 @enderror">
+                            @error('budget')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="col-span-6 sm:col-span-3">
-                            <label for="start_date" class="block text-sm font-medium text-gray-700">開始日</label>
-                            <input type="date" name="start_date" id="start_date" value="{{ old('start_date', $project->start_date ? $project->start_date->format('Y-m-d') : '') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('start_date') border-red-300 @enderror">
-                            @error('start_date')
+                            <label for="baseline_start_date" class="block text-sm font-medium text-gray-700">計画開始日</label>
+                            <input type="date" name="baseline_start_date" id="baseline_start_date" value="{{ old('baseline_start_date', $project->baseline_start_date ? $project->baseline_start_date->format('Y-m-d') : '') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('baseline_start_date') border-red-300 @enderror">
+                            @error('baseline_start_date')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="col-span-6 sm:col-span-3">
-                            <label for="end_date" class="block text-sm font-medium text-gray-700">終了日</label>
-                            <input type="date" name="end_date" id="end_date" value="{{ old('end_date', $project->end_date ? $project->end_date->format('Y-m-d') : '') }}"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('end_date') border-red-300 @enderror">
-                            @error('end_date')
+                            <label for="baseline_end_date" class="block text-sm font-medium text-gray-700">計画終了日</label>
+                            <input type="date" name="baseline_end_date" id="baseline_end_date" value="{{ old('baseline_end_date', $project->baseline_end_date ? $project->baseline_end_date->format('Y-m-d') : '') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('baseline_end_date') border-red-300 @enderror">
+                            @error('baseline_end_date')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <label for="actual_start_date" class="block text-sm font-medium text-gray-700">実績開始日</label>
+                            <input type="date" name="actual_start_date" id="actual_start_date" value="{{ old('actual_start_date', $project->actual_start_date ? $project->actual_start_date->format('Y-m-d') : '') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('actual_start_date') border-red-300 @enderror">
+                            @error('actual_start_date')
+                                <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-6 sm:col-span-3">
+                            <label for="actual_end_date" class="block text-sm font-medium text-gray-700">実績終了日</label>
+                            <input type="date" name="actual_end_date" id="actual_end_date" value="{{ old('actual_end_date', $project->actual_end_date ? $project->actual_end_date->format('Y-m-d') : '') }}"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('actual_end_date') border-red-300 @enderror">
+                            @error('actual_end_date')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
 
                         <div class="col-span-6">
-                            <label for="description" class="block text-sm font-medium text-gray-700">プロジェクト説明</label>
-                            <textarea name="description" id="description" rows="3"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('description') border-red-300 @enderror">{{ old('description', $project->description) }}</textarea>
-                            @error('description')
+                            <label for="deliverables_summary" class="block text-sm font-medium text-gray-700">成果物概要</label>
+                            <textarea name="deliverables_summary" id="deliverables_summary" rows="4"
+                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm @error('deliverables_summary') border-red-300 @enderror">{{ old('deliverables_summary', $project->deliverables_summary) }}</textarea>
+                            @error('deliverables_summary')
                                 <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
                             @enderror
+                        </div>
+
+                        <div class="col-span-6">
+                            <label class="block text-sm font-medium text-gray-700">主要リンク</label>
+                            <div class="space-y-2">
+                                <input type="url" name="main_links[]" placeholder="Backlog/Issue URL" value="{{ old('main_links.0', $project->main_links[0] ?? '') }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <input type="url" name="main_links[]" placeholder="Gitリポジトリ URL" value="{{ old('main_links.1', $project->main_links[1] ?? '') }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                                <input type="url" name="main_links[]" placeholder="社内Wiki URL" value="{{ old('main_links.2', $project->main_links[2] ?? '') }}"
+                                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm">
+                            </div>
                         </div>
                     </div>
                 </div>
