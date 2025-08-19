@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <form action="{{ route('projects.store') }}" method="POST" class="mt-8 space-y-6">
+    <form action="https://pmosystem-production.up.railway.app/projects" method="POST" class="mt-8 space-y-6">
         @csrf
         
         <div class="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">

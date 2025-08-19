@@ -71,7 +71,7 @@
                                 </td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                     <a href="{{ route('projects.edit', $project) }}" class="text-blue-600 hover:text-blue-900 mr-4">編集</a>
-                                    <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('本当に削除しますか？')">

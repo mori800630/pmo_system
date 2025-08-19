@@ -12,7 +12,7 @@
         </div>
     </div>
 
-    <form action="{{ route('projects.update', $project) }}" method="POST" class="mt-8 space-y-6">
+    <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}" method="POST" class="mt-8 space-y-6">
         @csrf
         @method('PUT')
         

@@ -16,7 +16,7 @@
                     <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
                         編集
                     </a>
-                    <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
+                    <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}" method="POST" class="inline">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick="return confirm('本当に削除しますか？')">
@@ -274,7 +274,7 @@
     <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">チェックリスト項目を追加</h3>
-            <form id="addChecklistForm" action="{{ route('checklists.store', $project) }}" method="POST">
+            <form id="addChecklistForm" action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/checklists" method="POST">
                 @csrf
                 <input type="hidden" name="phase" id="phase">
                 <div class="mb-4">
