@@ -9,6 +9,8 @@
 /public/hot
 /public/storage
 /public/build/
+/bootstrap/cache/*.php
+!/bootstrap/cache/.gitignore
 
 # Storage (keep gitignore placeholders)
 /storage/*.key
