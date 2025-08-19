@@ -62,6 +62,7 @@ class LoginRequest extends FormRequest
             'user_email' => $user ? $user->email : null
         ]);
 
+        // ユーザーが見つからない場合
         if (!$user) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
@@ -79,7 +80,11 @@ class LoginRequest extends FormRequest
 
         // ログイン
         Auth::login($user, $this->boolean('remember'));
-        RateLimiter::clear($this->throttleKey());
+
+        RateLimiter::hit($this->throttleKey());
+        throw ValidationException::withMessages([
+            'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+        ]);
     }
 
     /**
