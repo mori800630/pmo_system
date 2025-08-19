@@ -81,10 +81,8 @@ class LoginRequest extends FormRequest
         // ログイン
         Auth::login($user, $this->boolean('remember'));
 
-        RateLimiter::hit($this->throttleKey());
-        throw ValidationException::withMessages([
-            'username' => 'ユーザーIDまたはパスワードが正しくありません。',
-        ]);
+        // ログイン成功時はRateLimiterをクリア
+        RateLimiter::clear($this->throttleKey());
     }
 
     /**
