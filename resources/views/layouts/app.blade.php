@@ -5,7 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'PMOシステム')</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @if(app()->environment('local'))
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @else
+        <link rel="stylesheet" href="{{ asset('build/assets/app-CtlWd-5B.css') }}">
+        <script src="{{ asset('build/assets/app-C0G0cght.js') }}" defer></script>
+    @endif
 </head>
 <body class="bg-gray-50 min-h-screen">
     <!-- ナビゲーションバー -->
