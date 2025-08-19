@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ChecklistController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 // Faviconルート（ブラウザの自動リクエスト用）
@@ -25,6 +26,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/projects/{project}/checklists', [ChecklistController::class, 'store'])->name('checklists.store');
     Route::put('/checklists/{checklist}', [ChecklistController::class, 'update'])->name('checklists.update');
     Route::delete('/checklists/{checklist}', [ChecklistController::class, 'destroy'])->name('checklists.destroy');
+
+    // ユーザー管理関連のルート（管理者のみ）
+    Route::resource('users', UserController::class);
 
     // プロフィール関連のルート
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

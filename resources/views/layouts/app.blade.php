@@ -37,15 +37,11 @@
                         新規プロジェクト
                     </a>
                     
-                    <!-- ユーザーメニュー -->
-                    <div class="relative">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-white text-sm">{{ Auth::user()->name }}</span>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ Auth::user()->role_color_class }}">
-                                {{ Auth::user()->role_name }}
-                            </span>
-                        </div>
-                    </div>
+                    @if(Auth::user()->isAdmin())
+                    <a href="{{ route('users.index') }}" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
+                        ユーザー管理
+                    </a>
+                    @endif
                     
                     <!-- ログアウト -->
                     <form method="POST" action="https://pmosystem-production.up.railway.app/logout" class="inline">
@@ -54,6 +50,14 @@
                             ログアウト
                         </button>
                     </form>
+                    
+                    <!-- ユーザー情報（右端に配置） -->
+                    <div class="flex items-center space-x-2 ml-4 pl-4 border-l border-blue-500">
+                        <span class="text-white text-sm">{{ Auth::user()->name }}</span>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ Auth::user()->role_color_class }}">
+                            {{ Auth::user()->role_name }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
