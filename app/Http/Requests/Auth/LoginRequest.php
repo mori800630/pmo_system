@@ -46,43 +46,72 @@ class LoginRequest extends FormRequest
         $password = $this->input('password');
 
         // デバッグログ
-        \Log::info('Login attempt', [
+        \Log::info('Login attempt started', [
             'username' => $username,
-            'password_length' => strlen($password)
+            'password_length' => strlen($password),
+            'ip' => $this->ip(),
+            'user_agent' => $this->userAgent()
         ]);
 
-        // ユーザーIDまたはメールアドレスでユーザーを検索
-        $user = \App\Models\User::findByUsernameOrEmail($username);
+        try {
+            // ユーザーIDまたはメールアドレスでユーザーを検索
+            $user = \App\Models\User::findByUsernameOrEmail($username);
 
-        // デバッグログ
-        \Log::info('User found', [
-            'user_exists' => $user ? true : false,
-            'user_id' => $user ? $user->id : null,
-            'user_username' => $user ? $user->username : null,
-            'user_email' => $user ? $user->email : null
-        ]);
-
-        // ユーザーが見つからない場合
-        if (!$user) {
-            RateLimiter::hit($this->throttleKey());
-            throw ValidationException::withMessages([
-                'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+            // デバッグログ
+            \Log::info('User lookup result', [
+                'user_exists' => $user ? true : false,
+                'user_id' => $user ? $user->id : null,
+                'user_username' => $user ? $user->username : null,
+                'user_email' => $user ? $user->email : null,
+                'user_role' => $user ? $user->role : null
             ]);
-        }
 
-        // パスワードを検証
-        if (!Hash::check($password, $user->password)) {
-            RateLimiter::hit($this->throttleKey());
-            throw ValidationException::withMessages([
-                'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+            // ユーザーが見つからない場合
+            if (!$user) {
+                \Log::warning('User not found', ['username' => $username]);
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+                ]);
+            }
+
+            // パスワードを検証
+            $passwordValid = Hash::check($password, $user->password);
+            \Log::info('Password verification', [
+                'user_id' => $user->id,
+                'password_valid' => $passwordValid
             ]);
+
+            if (!$passwordValid) {
+                \Log::warning('Invalid password', [
+                    'user_id' => $user->id,
+                    'username' => $username
+                ]);
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+                ]);
+            }
+
+            // ログイン
+            Auth::login($user, $this->boolean('remember'));
+            \Log::info('Login successful', [
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'remember' => $this->boolean('remember')
+            ]);
+
+            // ログイン成功時はRateLimiterをクリア
+            RateLimiter::clear($this->throttleKey());
+
+        } catch (Exception $e) {
+            \Log::error('Login error', [
+                'username' => $username,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            throw $e;
         }
-
-        // ログイン
-        Auth::login($user, $this->boolean('remember'));
-
-        // ログイン成功時はRateLimiterをクリア
-        RateLimiter::clear($this->throttleKey());
     }
 
     /**
