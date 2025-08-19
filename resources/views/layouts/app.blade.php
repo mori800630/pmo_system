@@ -8,8 +8,14 @@
     @if(app()->environment('local'))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @else
-        <link rel="stylesheet" href="https://pmosystem-production.up.railway.app/build/assets/app-CtlWd-5B.css">
-        <script src="https://pmosystem-production.up.railway.app/build/assets/app-C0G0cght.js" defer></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                theme: {
+                    extend: {}
+                }
+            }
+        </script>
     @endif
 </head>
 <body class="bg-gray-50 min-h-screen">
