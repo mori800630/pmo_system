@@ -43,7 +43,7 @@
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900 mr-3">編集</a>
                         @if($user->id !== auth()->id())
-                        <form method="POST" action="{{ route('users.destroy', $user) }}" class="inline">
+                        <form method="POST" action="https://pmosystem-production.up.railway.app/users/{{ $user->id }}" class="inline">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('このユーザーを削除しますか？')">

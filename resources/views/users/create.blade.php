@@ -16,7 +16,7 @@
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <form method="POST" action="{{ route('users.store') }}">
+            <form method="POST" action="https://pmosystem-production.up.railway.app/users">
                 @csrf
 
                 <div class="mb-4">

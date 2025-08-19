@@ -16,7 +16,7 @@
         </div>
 
         <div class="bg-white shadow-md rounded-lg p-6">
-            <form method="POST" action="{{ route('users.update', $user) }}">
+            <form method="POST" action="https://pmosystem-production.up.railway.app/users/{{ $user->id }}">
                 @csrf
                 @method('PUT')
 
