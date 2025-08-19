@@ -33,7 +33,6 @@
     },
     "scripts": {
         "post-autoload-dump": [
-            "@php artisan clear-compiled",
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
