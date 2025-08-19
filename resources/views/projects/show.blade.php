@@ -10,7 +10,7 @@
             <div class="flex justify-between items-start">
                 <div>
                     <h3 class="text-lg leading-6 font-medium text-gray-900">{{ $project->name }}</h3>
-                    <p class="mt-1 max-w-2xl text-sm text-gray-500">プロジェクトコード: {{ $project->code }}</p>
+                    <p class="mt-1 max-w-2xl text-sm text-gray-500">顧客: {{ $project->customer_name }}</p>
                 </div>
                 <div class="flex space-x-3">
                     <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
@@ -29,47 +29,88 @@
         <div class="border-t border-gray-200">
             <dl>
                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">進捗ヘルス</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->health_color_class }}">
+                            {{ $project->health_name }}
+                        </span>
+                    </dd>
+                </div>
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt class="text-sm font-medium text-gray-500">PM名</dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $project->pm_name }}</dd>
                 </div>
-                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">ステータス</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        @switch($project->status)
-                            @case('planning')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    計画
-                                </span>
-                                @break
-                            @case('execution')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    実行
-                                </span>
-                                @break
-                            @case('completion')
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                    終結
-                                </span>
-                                @break
-                        @endswitch
-                    </dd>
-                </div>
                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">開始日</dt>
+                    <dt class="text-sm font-medium text-gray-500">優先度</dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {{ $project->start_date ? $project->start_date->format('Y年m月d日') : '未設定' }}
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->priority_color_class }}">
+                            {{ $project->priority_name }}
+                        </span>
                     </dd>
                 </div>
                 <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">終了日</dt>
+                    <dt class="text-sm font-medium text-gray-500">フェーズ</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $project->phase_name }}</dd>
+                </div>
+                @if($project->budget)
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">予算</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">¥{{ number_format($project->budget) }}</dd>
+                </div>
+                @endif
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">計画期間</dt>
                     <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                        {{ $project->end_date ? $project->end_date->format('Y年m月d日') : '未設定' }}
+                        @if($project->baseline_start_date && $project->baseline_end_date)
+                            {{ $project->baseline_start_date->format('Y年m月d日') }} ～ {{ $project->baseline_end_date->format('Y年m月d日') }}
+                        @else
+                            未設定
+                        @endif
                     </dd>
                 </div>
-                @if($project->description)
                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                    <dt class="text-sm font-medium text-gray-500">説明</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-line">{{ $project->description }}</dd>
+                    <dt class="text-sm font-medium text-gray-500">実績期間</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        @if($project->actual_start_date && $project->actual_end_date)
+                            {{ $project->actual_start_date->format('Y年m月d日') }} ～ {{ $project->actual_end_date->format('Y年m月d日') }}
+                        @elseif($project->actual_start_date)
+                            {{ $project->actual_start_date->format('Y年m月d日') }} ～ 進行中
+                        @else
+                            未設定
+                        @endif
+                    </dd>
+                </div>
+                @if($project->deliverables_summary)
+                <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">成果物概要</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-line">{{ $project->deliverables_summary }}</dd>
+                </div>
+                @endif
+                @if($project->main_links && count(array_filter($project->main_links)))
+                <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                    <dt class="text-sm font-medium text-gray-500">主要リンク</dt>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                        <div class="space-y-1">
+                            @foreach($project->main_links as $index => $link)
+                                @if($link)
+                                    <div>
+                                        @switch($index)
+                                            @case(0)
+                                                <span class="text-gray-500">Backlog/Issue:</span>
+                                                @break
+                                            @case(1)
+                                                <span class="text-gray-500">Gitリポジトリ:</span>
+                                                @break
+                                            @case(2)
+                                                <span class="text-gray-500">社内Wiki:</span>
+                                                @break
+                                        @endswitch
+                                        <a href="{{ $link }}" target="_blank" class="text-blue-600 hover:text-blue-800 ml-1">{{ $link }}</a>
+                                    </div>
+                                @endif
+                            @endforeach
+                        </div>
+                    </dd>
                 </div>
                 @endif
             </dl>
