@@ -39,8 +39,6 @@
                         ユーザー管理
                     </a>
                     @endif
-                    <!-- デバッグ情報（一時的） -->
-                    <!-- ユーザーID: {{ Auth::id() }}, 権限: {{ Auth::user()->role }}, isAdmin: {{ Auth::user()->isAdmin() ? 'true' : 'false' }} -->
                     
                     <!-- ログアウト -->
                     <form method="POST" action="https://pmosystem-production.up.railway.app/logout" class="inline">
