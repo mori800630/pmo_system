@@ -1,61 +1,165 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# PMOシステム (PMO System)
 
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://img.shields.io/badge/Laravel-11.x-red.svg" alt="Laravel Version">
+<img src="https://img.shields.io/badge/PHP-8.2+-blue.svg" alt="PHP Version">
+<img src="https://img.shields.io/badge/Tailwind_CSS-3.x-38B2AC.svg" alt="Tailwind CSS">
+<img src="https://img.shields.io/badge/PostgreSQL-15+-336791.svg" alt="PostgreSQL">
 </p>
 
-## About Laravel
+## 概要
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+PMOシステムは、プロジェクト管理を効率化するためのWebアプリケーションです。プロジェクトの進捗管理、チェックリスト機能、リスク管理を統合的にサポートします。
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### 主な機能
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **プロジェクト管理**
+  - プロジェクトの登録・編集・削除
+  - 進捗ヘルス（Green/Amber/Red）による状況把握
+  - 優先度管理（High/Medium/Low）
+  - フェーズ管理（企画・要件・設計・実装・テスト・リリース・運用）
 
-## Learning Laravel
+- **チェックリスト機能**
+  - 計画・実行・終結の3フェーズ別チェックリスト
+  - 進捗状況の可視化
+  - カスタムチェックリスト項目の追加・編集
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- **プロジェクト情報管理**
+  - 顧客情報管理
+  - 予算管理
+  - 計画期間・実績期間の管理
+  - 成果物概要の記録
+  - 主要リンク（Backlog/Issue、Gitリポジトリ、社内Wiki）の管理
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 技術スタック
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### バックエンド
+- **Laravel 11.x** - PHP Webフレームワーク
+- **PHP 8.2+** - プログラミング言語
+- **PostgreSQL** - データベース
+- **Eloquent ORM** - データベース操作
 
-## Laravel Sponsors
+### フロントエンド
+- **Tailwind CSS** - CSSフレームワーク（CDN版）
+- **Blade** - テンプレートエンジン
+- **Alpine.js** - 軽量JavaScriptフレームワーク
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### インフラ・デプロイ
+- **Railway** - PaaS（Platform as a Service）
+- **GitHub** - バージョン管理
+- **Docker** - コンテナ化（Railwayで自動管理）
 
-### Premium Partners
+## セットアップ
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 前提条件
+- PHP 8.2以上
+- Composer
+- Node.js（開発時のみ）
+- PostgreSQL
 
-## Contributing
+### ローカル開発環境
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+1. **リポジトリのクローン**
+```bash
+git clone https://github.com/mori800630/pmo_system.git
+cd pmo_system
+```
 
-## Code of Conduct
+2. **依存関係のインストール**
+```bash
+composer install
+npm install
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+3. **環境設定**
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-## Security Vulnerabilities
+4. **データベース設定**
+```bash
+# .envファイルでデータベース接続情報を設定
+php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **アセットのビルド**
+```bash
+npm run build
+```
 
-## License
+6. **開発サーバーの起動**
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 本番環境（Railway）
+
+1. **Railwayプロジェクトの作成**
+2. **GitHubリポジトリとの連携**
+3. **環境変数の設定**
+4. **自動デプロイの確認**
+
+## データベース構造
+
+### プロジェクトテーブル（projects）
+- `id` - 主キー
+- `name` - プロジェクト名
+- `pm_name` - PM名
+- `health` - 進捗ヘルス（Green/Amber/Red）
+- `customer_name` - 顧客名
+- `priority` - 優先度（High/Medium/Low）
+- `phase` - フェーズ
+- `budget` - 予算
+- `baseline_start_date` - 計画開始日
+- `baseline_end_date` - 計画終了日
+- `actual_start_date` - 実績開始日
+- `actual_end_date` - 実績終了日
+- `deliverables_summary` - 成果物概要
+- `main_links` - 主要リンク（JSON）
+
+### チェックリストテーブル（checklists）
+- `id` - 主キー
+- `project_id` - プロジェクトID（外部キー）
+- `phase` - フェーズ
+- `title` - タイトル
+- `description` - 説明
+- `is_completed` - 完了フラグ
+- `order` - 表示順序
+
+## デプロイ
+
+### Railwayでのデプロイ
+
+1. **Build Command**
+```
+composer install --optimize-autoloader --no-dev && npm install && npm run build
+```
+
+2. **Start Command**
+```
+php -d variables_order=EGPCS -S 0.0.0.0:$PORT -t public public/index.php
+```
+
+3. **環境変数**
+```
+APP_ENV=production
+APP_DEBUG=false
+APP_URL=https://your-app.railway.app
+DB_CONNECTION=pgsql
+```
+
+## ライセンス
+
+このプロジェクトはMITライセンスの下で公開されています。
+
+## 作者
+
+- **森** - 開発者
+
+## 更新履歴
+
+- **v1.0.0** - 初期リリース
+  - プロジェクト管理機能
+  - チェックリスト機能
+  - 進捗管理機能
