@@ -5,6 +5,11 @@ use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ChecklistController;
 use Illuminate\Support\Facades\Route;
 
+// Faviconルート（ブラウザの自動リクエスト用）
+Route::get('/favicon.ico', function () {
+    return response('', 204);
+});
+
 // 認証が必要なルート
 Route::middleware('auth')->group(function () {
     // ダッシュボード（プロジェクト一覧にリダイレクト）
