@@ -5,6 +5,7 @@ namespace App\Http\Requests\Auth;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -44,17 +45,40 @@ class LoginRequest extends FormRequest
         $username = $this->input('username');
         $password = $this->input('password');
 
+        // デバッグログ
+        \Log::info('Login attempt', [
+            'username' => $username,
+            'password_length' => strlen($password)
+        ]);
+
         // ユーザーIDまたはメールアドレスでユーザーを検索
         $user = \App\Models\User::findByUsernameOrEmail($username);
 
-        if (!$user || !Auth::attempt(['id' => $user->id, 'password' => $password], $this->boolean('remember'))) {
-            RateLimiter::hit($this->throttleKey());
+        // デバッグログ
+        \Log::info('User found', [
+            'user_exists' => $user ? true : false,
+            'user_id' => $user ? $user->id : null,
+            'user_username' => $user ? $user->username : null,
+            'user_email' => $user ? $user->email : null
+        ]);
 
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'username' => 'ユーザーIDまたはパスワードが正しくありません。',
             ]);
         }
 
+        // パスワードを検証
+        if (!Hash::check($password, $user->password)) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'username' => 'ユーザーIDまたはパスワードが正しくありません。',
+            ]);
+        }
+
+        // ログイン
+        Auth::login($user, $this->boolean('remember'));
         RateLimiter::clear($this->throttleKey());
     }
 
