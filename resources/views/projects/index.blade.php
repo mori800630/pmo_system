@@ -61,7 +61,13 @@
                                     {{ $project->actual_start_date ? $project->actual_start_date->format('Y/m/d') : '-' }}
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $project->actual_end_date ? $project->actual_end_date->format('Y/m/d') : '-' }}
+                                    @if($project->actual_end_date)
+                                        {{ $project->actual_end_date->format('Y/m/d') }}
+                                    @elseif($project->actual_start_date)
+                                        進行中
+                                    @else
+                                        -
+                                    @endif
                                 </td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                     <a href="{{ route('projects.edit', $project) }}" class="text-blue-600 hover:text-blue-900 mr-4">編集</a>
