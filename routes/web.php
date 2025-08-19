@@ -28,7 +28,9 @@ Route::middleware('auth')->group(function () {
     Route::delete('/checklists/{checklist}', [ChecklistController::class, 'destroy'])->name('checklists.destroy');
 
     // ユーザー管理関連のルート（管理者のみ）
-    Route::resource('users', UserController::class);
+    Route::middleware(['auth', 'admin'])->group(function () {
+        Route::resource('users', UserController::class);
+    });
 
     // プロフィール関連のルート
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
