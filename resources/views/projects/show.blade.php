@@ -69,7 +69,7 @@
                 @if($project->description)
                 <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                     <dt class="text-sm font-medium text-gray-500">説明</dt>
-                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">{{ $project->description }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 whitespace-pre-line">{{ $project->description }}</dd>
                 </div>
                 @endif
             </dl>
@@ -85,6 +85,20 @@
                 <p class="mt-1 max-w-2xl text-sm text-yellow-700">プロジェクトの立ち上げと計画策定（プロジェクト内容の理解、体制確認、スケジュール策定、リスク分析など）</p>
             </div>
             <div class="border-t border-yellow-200">
+                @php
+                    $planningCompleted = $project->planningChecklists->where('is_completed', true)->count();
+                    $planningTotal = $project->planningChecklists->count();
+                    $planningPercent = $planningTotal ? intval($planningCompleted / $planningTotal * 100) : 0;
+                @endphp
+                <div class="px-4 py-3 bg-white">
+                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
+                        <span>進捗: <span class="font-medium">{{ $planningCompleted }} / {{ $planningTotal }}</span></span>
+                        <span class="tabular-nums">{{ $planningPercent }}%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded">
+                        <div class="h-2 bg-yellow-400 rounded" style="width: {{ $planningPercent }}%"></div>
+                    </div>
+                </div>
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->planningChecklists as $checklist)
                     <li class="px-4 py-4">
@@ -112,7 +126,7 @@
                             </div>
                         </div>
                         @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7">{{ $checklist->description }}</p>
+                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
                         @endif
                     </li>
                     @empty
@@ -134,6 +148,20 @@
                 <p class="mt-1 max-w-2xl text-sm text-blue-700">プロジェクトの実行・監視（キックオフ、課題管理、進捗管理、品質管理など）</p>
             </div>
             <div class="border-t border-blue-200">
+                @php
+                    $executionCompleted = $project->executionChecklists->where('is_completed', true)->count();
+                    $executionTotal = $project->executionChecklists->count();
+                    $executionPercent = $executionTotal ? intval($executionCompleted / $executionTotal * 100) : 0;
+                @endphp
+                <div class="px-4 py-3 bg-white">
+                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
+                        <span>進捗: <span class="font-medium">{{ $executionCompleted }} / {{ $executionTotal }}</span></span>
+                        <span class="tabular-nums">{{ $executionPercent }}%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded">
+                        <div class="h-2 bg-blue-400 rounded" style="width: {{ $executionPercent }}%"></div>
+                    </div>
+                </div>
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->executionChecklists as $checklist)
                     <li class="px-4 py-4">
@@ -161,7 +189,7 @@
                             </div>
                         </div>
                         @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7">{{ $checklist->description }}</p>
+                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
                         @endif
                     </li>
                     @empty
@@ -183,6 +211,20 @@
                 <p class="mt-1 max-w-2xl text-sm text-green-700">プロジェクトの終結（成果物確認、結果評価、ポストモーテム実施など）</p>
             </div>
             <div class="border-t border-green-200">
+                @php
+                    $completionCompleted = $project->completionChecklists->where('is_completed', true)->count();
+                    $completionTotal = $project->completionChecklists->count();
+                    $completionPercent = $completionTotal ? intval($completionCompleted / $completionTotal * 100) : 0;
+                @endphp
+                <div class="px-4 py-3 bg-white">
+                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
+                        <span>進捗: <span class="font-medium">{{ $completionCompleted }} / {{ $completionTotal }}</span></span>
+                        <span class="tabular-nums">{{ $completionPercent }}%</span>
+                    </div>
+                    <div class="w-full h-2 bg-gray-200 rounded">
+                        <div class="h-2 bg-green-400 rounded" style="width: {{ $completionPercent }}%"></div>
+                    </div>
+                </div>
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->completionChecklists as $checklist)
                     <li class="px-4 py-4">
@@ -210,7 +252,7 @@
                             </div>
                         </div>
                         @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7">{{ $checklist->description }}</p>
+                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
                         @endif
                     </li>
                     @empty
