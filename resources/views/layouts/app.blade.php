@@ -33,15 +33,14 @@
                     <a href="{{ route('projects.index') }}" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
                         プロジェクト一覧
                     </a>
-                    <a href="{{ route('projects.create') }}" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium">
-                        新規プロジェクト
-                    </a>
                     
                     @if(Auth::user()->isAdmin())
                     <a href="{{ route('users.index') }}" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
                         ユーザー管理
                     </a>
                     @endif
+                    <!-- デバッグ情報（一時的） -->
+                    <!-- ユーザーID: {{ Auth::id() }}, 権限: {{ Auth::user()->role }}, isAdmin: {{ Auth::user()->isAdmin() ? 'true' : 'false' }} -->
                     
                     <!-- ログアウト -->
                     <form method="POST" action="https://pmosystem-production.up.railway.app/logout" class="inline">
