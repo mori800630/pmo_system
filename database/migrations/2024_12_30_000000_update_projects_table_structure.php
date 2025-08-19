@@ -16,11 +16,11 @@ return new class extends Migration
             // 既存のカラムを削除
             $table->dropColumn(['code', 'description', 'status', 'start_date', 'end_date']);
             
-            // 新しいカラムを追加（nullableで追加してから、デフォルト値を設定）
-            $table->enum('health', ['Green', 'Amber', 'Red'])->nullable()->after('pm_name'); // 進捗ヘルス
+            // 新しいカラムを追加（nullableで追加）
+            $table->string('health')->nullable()->after('pm_name'); // 進捗ヘルス
             $table->string('customer_name')->nullable()->after('health'); // 顧客名
-            $table->enum('priority', ['High', 'Medium', 'Low'])->nullable()->after('customer_name'); // 優先度
-            $table->enum('phase', ['planning', 'requirements', 'design', 'implementation', 'testing', 'release', 'operation'])->nullable()->after('priority'); // フェーズ
+            $table->string('priority')->nullable()->after('customer_name'); // 優先度
+            $table->string('phase')->nullable()->after('priority'); // フェーズ
             $table->decimal('budget', 15, 2)->nullable()->after('phase'); // 予算
             $table->date('baseline_start_date')->nullable()->after('budget'); // 計画開始日
             $table->date('baseline_end_date')->nullable()->after('baseline_start_date'); // 計画終了日
@@ -40,10 +40,10 @@ return new class extends Migration
 
         // NOT NULL制約を追加
         Schema::table('projects', function (Blueprint $table) {
-            $table->enum('health', ['Green', 'Amber', 'Red'])->nullable(false)->change();
+            $table->string('health')->nullable(false)->change();
             $table->string('customer_name')->nullable(false)->change();
-            $table->enum('priority', ['High', 'Medium', 'Low'])->nullable(false)->change();
-            $table->enum('phase', ['planning', 'requirements', 'design', 'implementation', 'testing', 'release', 'operation'])->nullable(false)->change();
+            $table->string('priority')->nullable(false)->change();
+            $table->string('phase')->nullable(false)->change();
         });
     }
 
