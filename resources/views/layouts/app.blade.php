@@ -35,6 +35,24 @@
                     <a href="{{ route('projects.create') }}" class="bg-blue-700 hover:bg-blue-800 text-white px-4 py-2 rounded-md text-sm font-medium">
                         新規プロジェクト
                     </a>
+                    
+                    <!-- ユーザーメニュー -->
+                    <div class="relative">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-white text-sm">{{ Auth::user()->name }}</span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ Auth::user()->role_color_class }}">
+                                {{ Auth::user()->role_name }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- ログアウト -->
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
+                            ログアウト
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
