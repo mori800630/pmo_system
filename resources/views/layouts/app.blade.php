@@ -47,7 +47,7 @@
                     </div>
                     
                     <!-- ログアウト -->
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                    <form method="POST" action="https://pmosystem-production.up.railway.app/logout" class="inline">
                         @csrf
                         <button type="submit" class="text-white hover:text-blue-200 px-3 py-2 rounded-md text-sm font-medium">
                             ログアウト
