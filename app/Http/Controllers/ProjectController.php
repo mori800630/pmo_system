@@ -32,14 +32,28 @@ class ProjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:projects',
             'pm_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'health' => 'required|in:Green,Amber,Red',
+            'customer_name' => 'required|string|max:255',
+            'priority' => 'required|in:High,Medium,Low',
+            'phase' => 'required|in:planning,requirements,design,implementation,testing,release,operation',
+            'budget' => 'nullable|numeric|min:0',
+            'baseline_start_date' => 'nullable|date',
+            'baseline_end_date' => 'nullable|date|after_or_equal:baseline_start_date',
+            'actual_start_date' => 'nullable|date',
+            'actual_end_date' => 'nullable|date|after_or_equal:actual_start_date',
+            'deliverables_summary' => 'nullable|string',
+            'main_links' => 'nullable|array',
+            'main_links.*' => 'nullable|url',
         ]);
 
-        $project = Project::create($request->all());
+        $data = $request->all();
+        // main_linksをJSON形式で保存
+        if (isset($data['main_links'])) {
+            $data['main_links'] = array_filter($data['main_links']); // 空の値を削除
+        }
+
+        $project = Project::create($data);
 
         // デフォルトのチェックリスト項目を作成
         $this->createDefaultChecklists($project);
@@ -75,15 +89,28 @@ class ProjectController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:projects,code,' . $project->id,
             'pm_name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'required|in:planning,execution,completion',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'health' => 'required|in:Green,Amber,Red',
+            'customer_name' => 'required|string|max:255',
+            'priority' => 'required|in:High,Medium,Low',
+            'phase' => 'required|in:planning,requirements,design,implementation,testing,release,operation',
+            'budget' => 'nullable|numeric|min:0',
+            'baseline_start_date' => 'nullable|date',
+            'baseline_end_date' => 'nullable|date|after_or_equal:baseline_start_date',
+            'actual_start_date' => 'nullable|date',
+            'actual_end_date' => 'nullable|date|after_or_equal:actual_start_date',
+            'deliverables_summary' => 'nullable|string',
+            'main_links' => 'nullable|array',
+            'main_links.*' => 'nullable|url',
         ]);
 
-        $project->update($request->all());
+        $data = $request->all();
+        // main_linksをJSON形式で保存
+        if (isset($data['main_links'])) {
+            $data['main_links'] = array_filter($data['main_links']); // 空の値を削除
+        }
+
+        $project->update($data);
 
         return redirect()->route('projects.show', $project)
             ->with('success', 'プロジェクトが正常に更新されました。');

@@ -23,12 +23,14 @@
                     <table class="min-w-full divide-y divide-gray-300">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">プロジェクト名</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">コード</th>
+                                <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">進捗ヘルス</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">プロジェクト名</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">顧客名</th>
                                 <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">PM名</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">ステータス</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">開始日</th>
-                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">終了日</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">優先度</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">フェーズ</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">実績開始日</th>
+                                <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">実績終了日</th>
                                 <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                                     <span class="sr-only">操作</span>
                                 </th>
@@ -38,36 +40,28 @@
                             @forelse($projects as $project)
                             <tr>
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->health_color_class }}">
+                                        {{ $project->health_name }}
+                                    </span>
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm font-medium text-gray-900">
                                     <a href="{{ route('projects.show', $project) }}" class="text-blue-600 hover:text-blue-900">
                                         {{ $project->name }}
                                     </a>
                                 </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $project->code }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $project->customer_name }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $project->pm_name }}</td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    @switch($project->status)
-                                        @case('planning')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                                                計画
-                                            </span>
-                                            @break
-                                        @case('execution')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                実行
-                                            </span>
-                                            @break
-                                        @case('completion')
-                                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                                                終結
-                                            </span>
-                                            @break
-                                    @endswitch
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->priority_color_class }}">
+                                        {{ $project->priority_name }}
+                                    </span>
+                                </td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ $project->phase_name }}</td>
+                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                    {{ $project->actual_start_date ? $project->actual_start_date->format('Y/m/d') : '-' }}
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $project->start_date ? $project->start_date->format('Y/m/d') : '-' }}
-                                </td>
-                                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    {{ $project->end_date ? $project->end_date->format('Y/m/d') : '-' }}
+                                    {{ $project->actual_end_date ? $project->actual_end_date->format('Y/m/d') : '-' }}
                                 </td>
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                     <a href="{{ route('projects.edit', $project) }}" class="text-blue-600 hover:text-blue-900 mr-4">編集</a>
@@ -82,7 +76,7 @@
                             </tr>
                             @empty
                             <tr>
-                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500">
+                                <td colspan="9" class="px-6 py-4 text-center text-sm text-gray-500">
                                     プロジェクトが登録されていません。
                                 </td>
                             </tr>
