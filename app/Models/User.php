@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'username',
     ];
 
     /**
@@ -93,5 +94,15 @@ class User extends Authenticatable
             'pmo_manager' => 'bg-blue-100 text-blue-800',
             'user' => 'bg-gray-100 text-gray-800',
         ][$this->role] ?? 'bg-gray-100 text-gray-800';
+    }
+
+    /**
+     * ユーザーIDまたはメールアドレスで認証
+     */
+    public static function findByUsernameOrEmail($username)
+    {
+        return static::where('username', $username)
+                    ->orWhere('email', $username)
+                    ->first();
     }
 }
