@@ -12,12 +12,7 @@ class UserController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware(function ($request, $next) {
-            if (!auth()->user()->isAdmin()) {
-                abort(403, '管理者権限が必要です。');
-            }
-            return $next($request);
-        });
+        $this->middleware('admin');
     }
 
     /**
