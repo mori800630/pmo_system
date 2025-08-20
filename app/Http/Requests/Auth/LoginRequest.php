@@ -54,10 +54,13 @@ class LoginRequest extends FormRequest
         ]);
 
         // ユーザーIDまたはメールアドレスでユーザーを検索
+        \Log::info('Searching for user', ['username' => $username]);
         $user = \App\Models\User::findByUsernameOrEmail($username);
+        \Log::info('User search result', ['found' => $user ? 'yes' : 'no']);
 
         // ユーザーが見つからない場合
         if (!$user) {
+            \Log::warning('User not found', ['username' => $username]);
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'username' => 'ユーザーIDまたはパスワードが正しくありません。',
