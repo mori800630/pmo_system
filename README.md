@@ -13,6 +13,11 @@ PMOシステムは、プロジェクト管理を効率化するためのWebア�
 
 ### 主な機能
 
+- **ユーザー認証・管理**
+  - ユーザー認証（ユーザーID/メールアドレス + パスワード）
+  - ロールベースアクセス制御（管理者/PMOマネージャー/ユーザー）
+  - ユーザー管理機能（管理者のみ）
+
 - **プロジェクト管理**
   - プロジェクトの登録・編集・削除
   - 進捗ヘルス（Green/Amber/Red）による状況把握
@@ -38,6 +43,7 @@ PMOシステムは、プロジェクト管理を効率化するためのWebア�
 - **PHP 8.2+** - プログラミング言語
 - **PostgreSQL** - データベース
 - **Eloquent ORM** - データベース操作
+- **Laravel Breeze** - 認証スカフォールディング
 
 ### フロントエンド
 - **Tailwind CSS** - CSSフレームワーク（CDN版）
@@ -81,6 +87,7 @@ php artisan key:generate
 ```bash
 # .envファイルでデータベース接続情報を設定
 php artisan migrate
+php artisan db:seed --class=AdminUserSeeder
 ```
 
 5. **アセットのビルド**
@@ -93,6 +100,11 @@ npm run build
 php artisan serve
 ```
 
+### 初期ログイン情報
+- **ユーザー名**: `Admin`
+- **パスワード**: `Password123!`
+- **権限**: 管理者
+
 ### 本番環境（Railway）
 
 1. **Railwayプロジェクトの作成**
@@ -101,6 +113,16 @@ php artisan serve
 4. **自動デプロイの確認**
 
 ## データベース構造
+
+### ユーザーテーブル（users）
+- `id` - 主キー
+- `name` - 名前
+- `username` - ユーザーID（ログイン用）
+- `email` - メールアドレス（オプション）
+- `password` - パスワード（ハッシュ化）
+- `role` - 権限（admin/pmo_manager/user）
+- `created_at` - 作成日時
+- `updated_at` - 更新日時
 
 ### プロジェクトテーブル（projects）
 - `id` - 主キー
@@ -158,6 +180,12 @@ DB_CONNECTION=pgsql
 - **森** - 開発者
 
 ## 更新履歴
+
+- **v1.1.0** - 認証・ユーザー管理機能追加
+  - ユーザー認証機能（Laravel Breeze）
+  - ロールベースアクセス制御
+  - ユーザー管理機能（管理者のみ）
+  - セキュリティ強化
 
 - **v1.0.0** - 初期リリース
   - プロジェクト管理機能
