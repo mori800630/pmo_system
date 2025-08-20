@@ -68,7 +68,12 @@ class LoginRequest extends FormRequest
         }
 
         // パスワードを検証
-        if (!Hash::check($password, $user->password)) {
+        \Log::info('Password verification started', ['user_id' => $user->id]);
+        $passwordValid = Hash::check($password, $user->password);
+        \Log::info('Password verification result', ['valid' => $passwordValid]);
+        
+        if (!$passwordValid) {
+            \Log::warning('Invalid password', ['user_id' => $user->id]);
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'username' => 'ユーザーIDまたはパスワードが正しくありません。',
@@ -76,7 +81,9 @@ class LoginRequest extends FormRequest
         }
 
         // ログイン
+        \Log::info('Attempting to login user', ['user_id' => $user->id]);
         Auth::login($user, $this->boolean('remember'));
+        \Log::info('Login successful', ['user_id' => $user->id]);
 
         // ログイン成功時はRateLimiterをクリア
         RateLimiter::clear($this->throttleKey());
