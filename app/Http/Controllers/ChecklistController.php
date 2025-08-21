@@ -76,4 +76,85 @@ class ChecklistController extends Controller
         return redirect()->route('projects.show', $project)
             ->with('success', 'チェックリスト項目が削除されました。');
     }
+
+    /**
+     * PMが下書きを提出（Submitted）
+     */
+    public function submit(Checklist $checklist)
+    {
+        // PMのみ（admin/pmo_manager も可とするなら条件調整）
+        if (!auth()->user()->isUser() && !auth()->user()->isAdmin() && !auth()->user()->isPmoManager()) {
+            abort(403);
+        }
+
+        $checklist->update([
+            'status' => 'submitted',
+            'submitted_by' => auth()->id(),
+            'submitted_at' => now(),
+        ]);
+
+        return redirect()->route('projects.show', $checklist->project)
+            ->with('success', 'チェックリストを提出しました。');
+    }
+
+    /**
+     * PMOがレビュー開始（Under Review）
+     */
+    public function startReview(Checklist $checklist)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $checklist->update([
+            'status' => 'under_review',
+        ]);
+
+        return redirect()->route('projects.show', $checklist->project)
+            ->with('success', 'レビューを開始しました。');
+    }
+
+    /**
+     * PMOが承認（Approved）
+     */
+    public function approve(Request $request, Checklist $checklist)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $checklist->update([
+            'status' => 'approved',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+            'review_comment' => $request->input('review_comment'),
+        ]);
+
+        return redirect()->route('projects.show', $checklist->project)
+            ->with('success', '承認しました。');
+    }
+
+    /**
+     * PMOが差戻し（Rejected）
+     */
+    public function reject(Request $request, Checklist $checklist)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'review_comment' => 'required|string',
+        ]);
+
+        $checklist->update([
+            'status' => 'rejected',
+            'reviewed_by' => auth()->id(),
+            'reviewed_at' => now(),
+            'review_comment' => $request->input('review_comment'),
+        ]);
+
+        return redirect()->route('projects.show', $checklist->project)
+            ->with('success', '差戻しました。');
+    }
 }

@@ -36,6 +36,19 @@ PMOシステムは、プロジェクト管理を効率化するためのWebア�
   - 成果物概要の記録
   - 主要リンク（Backlog/Issue、Gitリポジトリ、社内Wiki）の管理
 
+### 権限体系
+
+- **Admin（システム管理者）**: ユーザー管理（作成/編集/削除/権限変更）、チェックリストテンプレート管理、システム設定
+- **PMO Manager（PMOマネージャ）**: 全プロジェクト閲覧/管理、チェックリストの承認/差戻し/質疑、レポート閲覧
+- **User（PM）**: 自身の担当プロジェクト管理、チェックリスト入力・編集、ドラフト保存・提出、PMOと質疑応答
+
+### チェックリスト ワークフロー
+
+Draft（下書き） → Submitted（提出） → Under Review（レビュー中） → Approved（承認）/ Rejected（差戻し）
+
+- PM（User）は Draft/Rejected を編集し、Submitted に提出可能
+- PMO Manager/Admin は Submitted を Under Review にし、Approve/Reject 可能
+
 ## 技術スタック
 
 ### バックエンド

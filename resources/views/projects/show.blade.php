@@ -152,11 +152,42 @@
                                 <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
                                     {{ $checklist->title }}
                                 </span>
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                    {{ $checklist->status_name }}
+                                </span>
                             </div>
                             <div class="flex space-x-2">
                                 <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
                                     編集
                                 </button>
+                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
+                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
+                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
+                                    </form>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                                    @if($checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
+                                    </form>
+                                    @endif
+                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="">
+                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    </form>
+                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="修正してください">
+                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
+                                    </form>
+                                    @endif
+                                @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -215,11 +246,42 @@
                                 <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
                                     {{ $checklist->title }}
                                 </span>
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                    {{ $checklist->status_name }}
+                                </span>
                             </div>
                             <div class="flex space-x-2">
                                 <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
                                     編集
                                 </button>
+                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
+                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
+                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
+                                    </form>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                                    @if($checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
+                                    </form>
+                                    @endif
+                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="">
+                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    </form>
+                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="修正してください">
+                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
+                                    </form>
+                                    @endif
+                                @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -278,11 +340,42 @@
                                 <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
                                     {{ $checklist->title }}
                                 </span>
+                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                    {{ $checklist->status_name }}
+                                </span>
                             </div>
                             <div class="flex space-x-2">
                                 <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
                                     編集
                                 </button>
+                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
+                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
+                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
+                                    </form>
+                                    @endif
+                                @endif
+                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                                    @if($checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
+                                    </form>
+                                    @endif
+                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
+                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="">
+                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    </form>
+                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
+                                        @csrf
+                                        <input type="hidden" name="review_comment" value="修正してください">
+                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
+                                    </form>
+                                    @endif
+                                @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')

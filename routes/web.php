@@ -27,6 +27,14 @@ Route::middleware('auth')->group(function () {
     Route::put('/checklists/{checklist}', [ChecklistController::class, 'update'])->name('checklists.update');
     Route::delete('/checklists/{checklist}', [ChecklistController::class, 'destroy'])->name('checklists.destroy');
 
+    // チェックリストワークフロールート
+    Route::post('/checklists/{checklist}/submit', [ChecklistController::class, 'submit'])->name('checklists.submit');
+    Route::middleware('pmo')->group(function () {
+        Route::post('/checklists/{checklist}/start-review', [ChecklistController::class, 'startReview'])->name('checklists.startReview');
+        Route::post('/checklists/{checklist}/approve', [ChecklistController::class, 'approve'])->name('checklists.approve');
+        Route::post('/checklists/{checklist}/reject', [ChecklistController::class, 'reject'])->name('checklists.reject');
+    });
+
     // ユーザー管理関連のルート（管理者のみ）
     Route::middleware(['auth', 'admin'])->group(function () {
         Route::resource('users', UserController::class);
