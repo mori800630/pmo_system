@@ -9,6 +9,9 @@ class ChecklistFeedback extends Model
 {
     use HasFactory;
 
+    // Eloquent は "feedback" を複数形にしないため、テーブル名を明示
+    protected $table = 'checklist_feedbacks';
+
     protected $fillable = [
         'checklist_id',
         'reviewer_id',
