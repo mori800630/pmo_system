@@ -207,7 +207,7 @@
                                 </button>
                                 @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
                                     @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
                                     </form>
@@ -215,7 +215,7 @@
                                 @endif
                                 @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                                     @if($checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
                                     </form>
@@ -225,7 +225,7 @@
                                     <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
-                                <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
+                                <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 text-sm" onclick="return confirm('削除しますか？')">
@@ -236,6 +236,16 @@
                         </div>
                         @if($checklist->description)
                         <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
+                        @endif
+                        @if($checklist->review_comment)
+                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
+                            <div class="text-sm text-gray-700">
+                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                @if($checklist->reviewed_by)
+                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                @endif
+                            </div>
+                        </div>
                         @endif
                     </li>
                     @empty
@@ -332,7 +342,7 @@
                                 </button>
                                 @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
                                     @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
                                     </form>
@@ -340,7 +350,7 @@
                                 @endif
                                 @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                                     @if($checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
                                     </form>
@@ -350,7 +360,7 @@
                                     <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
-                                <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
+                                <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 text-sm" onclick="return confirm('削除しますか？')">
@@ -361,6 +371,16 @@
                         </div>
                         @if($checklist->description)
                         <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
+                        @endif
+                        @if($checklist->review_comment)
+                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
+                            <div class="text-sm text-gray-700">
+                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                @if($checklist->reviewed_by)
+                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                @endif
+                            </div>
+                        </div>
                         @endif
                     </li>
                     @empty
@@ -457,7 +477,7 @@
                                 </button>
                                 @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
                                     @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="{{ route('checklists.submit', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
                                     </form>
@@ -465,7 +485,7 @@
                                 @endif
                                 @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                                     @if($checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.startReview', $checklist) }}" method="POST" class="inline">
+                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
                                         @csrf
                                         <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
                                     </form>
@@ -475,7 +495,7 @@
                                     <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
-                                <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
+                                <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-900 text-sm" onclick="return confirm('削除しますか？')">
@@ -486,6 +506,16 @@
                         </div>
                         @if($checklist->description)
                         <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
+                        @endif
+                        @if($checklist->review_comment)
+                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
+                            <div class="text-sm text-gray-700">
+                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                @if($checklist->reviewed_by)
+                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                @endif
+                            </div>
+                        </div>
                         @endif
                     </li>
                     @empty

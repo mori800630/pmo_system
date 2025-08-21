@@ -39,6 +39,22 @@ class Checklist extends Model
     }
 
     /**
+     * チェックリストを提出したユーザーを取得
+     */
+    public function submitter()
+    {
+        return $this->belongsTo(User::class, 'submitted_by');
+    }
+
+    /**
+     * チェックリストをレビューしたユーザーを取得
+     */
+    public function reviewer()
+    {
+        return $this->belongsTo(User::class, 'reviewed_by');
+    }
+
+    /**
      * フェーズの日本語名を取得
      */
     public function getPhaseNameAttribute()
