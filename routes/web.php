@@ -31,6 +31,7 @@ Route::middleware('auth')->group(function () {
     Route::patch('/checklists/{checklist}/toggle', [ChecklistController::class, 'toggle'])->name('checklists.toggle');
     Route::post('/projects/{project}/checklists', [ChecklistController::class, 'store'])->name('checklists.store');
     Route::put('/checklists/{checklist}', [ChecklistController::class, 'update'])->name('checklists.update');
+    Route::patch('/checklists/{checklist}/description', [ChecklistController::class, 'updateDescription'])->name('checklists.updateDescription');
     Route::delete('/checklists/{checklist}', [ChecklistController::class, 'destroy'])->name('checklists.destroy');
 
     // チェックリストワークフロールート

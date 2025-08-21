@@ -141,7 +141,7 @@
                             @if($project->planning_status === 'draft' || $project->planning_status === 'rejected')
                             <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/planning/submit" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">提出</button>
                             </form>
                             @endif
                         @endif
@@ -188,43 +188,47 @@
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->planningChecklists as $checklist)
                     <li class="px-4 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start flex-1">
                                 <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
                                        data-id="{{ $checklist->id }}"
                                        {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
-                                    {{ $checklist->title }}
-                                </span>
-                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
-                                    {{ $checklist->status_name }}
-                                </span>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                            {{ $checklist->title }}
+                                        </span>
+                                        <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                            {{ $checklist->status_name }}
+                                        </span>
+                                    </div>
+                                    @if($project->canEditBy(auth()->user()) && ($checklist->status === 'draft' || $checklist->status === 'rejected'))
+                                    <div class="mt-2">
+                                        <textarea 
+                                            class="w-full text-sm text-gray-700 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                                            rows="3"
+                                            placeholder="説明を入力してください..."
+                                            onchange="updateChecklistDescription({{ $checklist->id }}, this.value)"
+                                        >{{ $checklist->description }}</textarea>
+                                    </div>
+                                    @elseif($checklist->description)
+                                    <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
+                                    @endif
+                                    @if($checklist->review_comment)
+                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
+                                        <div class="text-sm text-gray-700">
+                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                            @if($checklist->reviewed_by)
+                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
-                                    編集
-                                </button>
-                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
-                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
-                                    </form>
-                                    @endif
-                                @endif
-                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
-                                    @if($checklist->status === 'submitted')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
-                                    </form>
-                                    @endif
-                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    @endif
-                                @endif
+                            @if($project->canEditBy(auth()->user()))
+                            <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -233,20 +237,8 @@
                                     </button>
                                 </form>
                             </div>
+                            @endif
                         </div>
-                        @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
-                        @endif
-                        @if($checklist->review_comment)
-                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
-                            <div class="text-sm text-gray-700">
-                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                @if($checklist->reviewed_by)
-                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
-                                @endif
-                            </div>
-                        </div>
-                        @endif
                     </li>
                     @empty
                     <li class="px-4 py-4 text-sm text-gray-500">チェックリスト項目がありません</li>
@@ -276,7 +268,7 @@
                             @if($project->execution_status === 'draft' || $project->execution_status === 'rejected')
                             <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/execution/submit" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">提出</button>
                             </form>
                             @endif
                         @endif
@@ -323,43 +315,47 @@
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->executionChecklists as $checklist)
                     <li class="px-4 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start flex-1">
                                 <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
                                        data-id="{{ $checklist->id }}"
                                        {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
-                                    {{ $checklist->title }}
-                                </span>
-                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
-                                    {{ $checklist->status_name }}
-                                </span>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                            {{ $checklist->title }}
+                                        </span>
+                                        <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                            {{ $checklist->status_name }}
+                                        </span>
+                                    </div>
+                                    @if($project->canEditBy(auth()->user()) && ($checklist->status === 'draft' || $checklist->status === 'rejected'))
+                                    <div class="mt-2">
+                                        <textarea 
+                                            class="w-full text-sm text-gray-700 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                                            rows="3"
+                                            placeholder="説明を入力してください..."
+                                            onchange="updateChecklistDescription({{ $checklist->id }}, this.value)"
+                                        >{{ $checklist->description }}</textarea>
+                                    </div>
+                                    @elseif($checklist->description)
+                                    <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
+                                    @endif
+                                    @if($checklist->review_comment)
+                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
+                                        <div class="text-sm text-gray-700">
+                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                            @if($checklist->reviewed_by)
+                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
-                                    編集
-                                </button>
-                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
-                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
-                                    </form>
-                                    @endif
-                                @endif
-                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
-                                    @if($checklist->status === 'submitted')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
-                                    </form>
-                                    @endif
-                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    @endif
-                                @endif
+                            @if($project->canEditBy(auth()->user()))
+                            <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -368,20 +364,8 @@
                                     </button>
                                 </form>
                             </div>
+                            @endif
                         </div>
-                        @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
-                        @endif
-                        @if($checklist->review_comment)
-                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
-                            <div class="text-sm text-gray-700">
-                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                @if($checklist->reviewed_by)
-                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
-                                @endif
-                            </div>
-                        </div>
-                        @endif
                     </li>
                     @empty
                     <li class="px-4 py-4 text-sm text-gray-500">チェックリスト項目がありません</li>
@@ -411,7 +395,7 @@
                             @if($project->completion_status === 'draft' || $project->completion_status === 'rejected')
                             <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/completion/submit" method="POST" class="inline">
                                 @csrf
-                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">提出</button>
                             </form>
                             @endif
                         @endif
@@ -458,43 +442,47 @@
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->completionChecklists as $checklist)
                     <li class="px-4 py-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
+                        <div class="flex items-start justify-between">
+                            <div class="flex items-start flex-1">
                                 <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle"
+                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
                                        data-id="{{ $checklist->id }}"
                                        {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <span class="ml-3 text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
-                                    {{ $checklist->title }}
-                                </span>
-                                <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
-                                    {{ $checklist->status_name }}
-                                </span>
+                                <div class="ml-3 flex-1">
+                                    <div class="flex items-center">
+                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                            {{ $checklist->title }}
+                                        </span>
+                                        <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
+                                            {{ $checklist->status_name }}
+                                        </span>
+                                    </div>
+                                    @if($project->canEditBy(auth()->user()) && ($checklist->status === 'draft' || $checklist->status === 'rejected'))
+                                    <div class="mt-2">
+                                        <textarea 
+                                            class="w-full text-sm text-gray-700 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-y"
+                                            rows="3"
+                                            placeholder="説明を入力してください..."
+                                            onchange="updateChecklistDescription({{ $checklist->id }}, this.value)"
+                                        >{{ $checklist->description }}</textarea>
+                                    </div>
+                                    @elseif($checklist->description)
+                                    <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
+                                    @endif
+                                    @if($checklist->review_comment)
+                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
+                                        <div class="text-sm text-gray-700">
+                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
+                                            @if($checklist->reviewed_by)
+                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    @endif
+                                </div>
                             </div>
-                            <div class="flex space-x-2">
-                                <button class="text-blue-600 hover:text-blue-900 text-sm" onclick="editChecklist({{ $checklist->id }}, '{{ $checklist->title }}', '{{ $checklist->description }}')">
-                                    編集
-                                </button>
-                                @if(auth()->user()->isUser() || auth()->user()->isAdmin() || auth()->user()->isPmoManager())
-                                    @if($checklist->status === 'draft' || $checklist->status === 'rejected')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/submit" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm">提出</button>
-                                    </form>
-                                    @endif
-                                @endif
-                                @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
-                                    @if($checklist->status === 'submitted')
-                                    <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}/start-review" method="POST" class="inline">
-                                        @csrf
-                                        <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm">レビュー開始</button>
-                                    </form>
-                                    @endif
-                                    @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    @endif
-                                @endif
+                            @if($project->canEditBy(auth()->user()))
+                            <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
                                     @method('DELETE')
@@ -503,20 +491,8 @@
                                     </button>
                                 </form>
                             </div>
+                            @endif
                         </div>
-                        @if($checklist->description)
-                        <p class="mt-1 text-sm text-gray-500 ml-7 whitespace-pre-line">{{ $checklist->description }}</p>
-                        @endif
-                        @if($checklist->review_comment)
-                        <div class="mt-2 ml-7 p-2 bg-gray-100 rounded-md">
-                            <div class="text-sm text-gray-700">
-                                <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                @if($checklist->reviewed_by)
-                                <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
-                                @endif
-                            </div>
-                        </div>
-                        @endif
                     </li>
                     @empty
                     <li class="px-4 py-4 text-sm text-gray-500">チェックリスト項目がありません</li>
@@ -594,55 +570,7 @@
     </div>
 </div>
 
-<!-- 承認モーダル -->
-<div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">承認</h3>
-            <form id="approveForm" method="POST">
-                @csrf
-                <div class="mb-4">
-                    <label for="approve_comment" class="block text-sm font-medium text-gray-700">コメント（任意）</label>
-                    <textarea name="review_comment" id="approve_comment" rows="4"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="承認コメントを入力してください"></textarea>
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="hideApproveModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        キャンセル
-                    </button>
-                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-                        承認
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
-<!-- 差戻しモーダル -->
-<div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
-    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
-        <div class="mt-3">
-            <h3 class="text-lg font-medium text-gray-900 mb-4">差戻し</h3>
-            <form id="rejectForm" method="POST">
-                @csrf
-                <div class="mb-4">
-                    <label for="reject_comment" class="block text-sm font-medium text-gray-700">コメント *</label>
-                    <textarea name="review_comment" id="reject_comment" rows="4" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="差戻し理由を入力してください"></textarea>
-                </div>
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="hideRejectModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
-                        キャンセル
-                    </button>
-                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                        差戻し
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- フェーズ承認モーダル -->
 <div id="phaseApproveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
@@ -747,29 +675,7 @@ function hideEditForm() {
     document.getElementById('editChecklistModal').classList.add('hidden');
 }
 
-// 承認モーダルを表示
-function showApproveModal(checklistId) {
-    document.getElementById('approveForm').action = `https://pmosystem-production.up.railway.app/checklists/${checklistId}/approve`;
-    document.getElementById('approveModal').classList.remove('hidden');
-}
 
-// 承認モーダルを非表示
-function hideApproveModal() {
-    document.getElementById('approveModal').classList.add('hidden');
-    document.getElementById('approveForm').reset();
-}
-
-// 差戻しモーダルを表示
-function showRejectModal(checklistId) {
-    document.getElementById('rejectForm').action = `https://pmosystem-production.up.railway.app/checklists/${checklistId}/reject`;
-    document.getElementById('rejectModal').classList.remove('hidden');
-}
-
-// 差戻しモーダルを非表示
-function hideRejectModal() {
-    document.getElementById('rejectModal').classList.add('hidden');
-    document.getElementById('rejectForm').reset();
-}
 
 // フェーズ承認モーダルを表示
 function showPhaseApproveModal(phase) {
@@ -793,6 +699,32 @@ function showPhaseRejectModal(phase) {
 function hidePhaseRejectModal() {
     document.getElementById('phaseRejectModal').classList.add('hidden');
     document.getElementById('phaseRejectForm').reset();
+}
+
+// チェックリスト説明のインライン更新
+function updateChecklistDescription(checklistId, description) {
+    fetch(`https://pmosystem-production.up.railway.app/checklists/${checklistId}/description`, {
+        method: 'PATCH',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            description: description
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // 成功時の処理（必要に応じて）
+            console.log('説明が更新されました');
+        } else {
+            console.error('説明の更新に失敗しました');
+        }
+    })
+    .catch(error => {
+        console.error('エラーが発生しました:', error);
+    });
 }
 </script>
 @endsection

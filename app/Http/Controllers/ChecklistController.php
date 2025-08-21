@@ -66,6 +66,25 @@ class ChecklistController extends Controller
     }
 
     /**
+     * チェックリスト項目の説明をインライン更新（AJAX）
+     */
+    public function updateDescription(Request $request, Checklist $checklist)
+    {
+        $request->validate([
+            'description' => 'nullable|string',
+        ]);
+
+        $checklist->update([
+            'description' => $request->description
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => '説明が更新されました'
+        ]);
+    }
+
+    /**
      * チェックリスト項目を削除
      */
     public function destroy(Checklist $checklist)
