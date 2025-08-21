@@ -212,7 +212,10 @@
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
                                     @php
-                                        $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        $feedbacks = collect();
+                                        if (\Illuminate\Support\Facades\Schema::hasTable('checklist_feedbacks')) {
+                                            $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        }
                                     @endphp
                                     @if($feedbacks->count())
                                     <div class="mt-2 space-y-2">
@@ -346,7 +349,10 @@
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
                                     @php
-                                        $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        $feedbacks = collect();
+                                        if (\Illuminate\Support\Facades\Schema::hasTable('checklist_feedbacks')) {
+                                            $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        }
                                     @endphp
                                     @if($feedbacks->count())
                                     <div class="mt-2 space-y-2">
@@ -480,7 +486,10 @@
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
                                     @php
-                                        $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        $feedbacks = collect();
+                                        if (\Illuminate\Support\Facades\Schema::hasTable('checklist_feedbacks')) {
+                                            $feedbacks = $checklist->feedbacks()->latest()->get();
+                                        }
                                     @endphp
                                     @if($feedbacks->count())
                                     <div class="mt-2 space-y-2">
