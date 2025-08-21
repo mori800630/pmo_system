@@ -189,7 +189,7 @@
                                         <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
-                                        @if($checklist->status === 'rejected')
+                                        @if($checklist->wasRejectedByPmo())
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
                                             {{ $checklist->status_name }}
                                         </span>
@@ -322,7 +322,7 @@
                                         <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
-                                        @if($checklist->status === 'rejected')
+                                        @if($checklist->wasRejectedByPmo())
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
                                             {{ $checklist->status_name }}
                                         </span>
@@ -455,7 +455,7 @@
                                         <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
-                                        @if($checklist->status === 'rejected')
+                                        @if($checklist->wasRejectedByPmo())
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
                                             {{ $checklist->status_name }}
                                         </span>

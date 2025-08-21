@@ -101,4 +101,14 @@ class Checklist extends Model
             default => 'bg-gray-100 text-gray-800',
         };
     }
+
+    /**
+     * 前回PMOが差し戻し時にチェックした項目かどうかを判定
+     */
+    public function wasRejectedByPmo()
+    {
+        // 最新のフィードバックがrejectedの場合
+        $latestFeedback = $this->feedbacks()->latest()->first();
+        return $latestFeedback && $latestFeedback->action === 'rejected';
+    }
 }
