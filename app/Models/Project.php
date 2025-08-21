@@ -230,40 +230,52 @@ class Project extends Model
      */
     public function getPhaseCommentHistory($phase)
     {
-        // 新テーブルに履歴があればそれを返す
+        $comments = collect();
+        
+        // 新テーブルに履歴があればそれを追加
         if (class_exists(\App\Models\ProjectPhaseFeedback::class)) {
             try {
-                return ProjectPhaseFeedback::where('project_id', $this->id)
+                $phaseFeedbacks = ProjectPhaseFeedback::where('project_id', $this->id)
                     ->where('phase', $phase)
                     ->with('reviewer')
                     ->orderByDesc('created_at')
-                    ->get()
-                    ->map(function ($row) {
-                        return [
-                            'comment' => $row->comment,
-                            'reviewer' => $row->reviewer,
-                            'created_at' => $row->created_at,
-                            'status' => $row->status_at_feedback,
-                        ];
-                    });
+                    ->get();
+                
+                foreach ($phaseFeedbacks as $row) {
+                    $comments->push([
+                        'comment' => $row->comment,
+                        'reviewer' => $row->reviewer,
+                        'created_at' => $row->created_at,
+                        'status' => $row->status_at_feedback,
+                    ]);
+                }
             } catch (\Throwable $e) {
-                // まだテーブルがない等の状況ではフォールバック
+                // まだテーブルがない等の状況ではスキップ
             }
         }
 
-        // フォールバック: 現在の単一コメントのみ
-        $comments = collect();
+        // 既存のコメントも履歴に追加（重複を避けるため）
         $currentComment = $this->{$phase . '_review_comment'};
         $reviewer = $this->getPhaseReviewer($phase);
         $reviewedAt = $this->{$phase . '_reviewed_at'};
+        
         if ($currentComment && $reviewer && $reviewedAt) {
-            $comments->push([
-                'comment' => $currentComment,
-                'reviewer' => $reviewer,
-                'created_at' => $reviewedAt,
-                'status' => $this->{$phase . '_status'},
-            ]);
+            // 同じコメントが既に履歴に含まれていないかチェック
+            $exists = $comments->contains(function ($comment) use ($currentComment, $reviewedAt) {
+                return $comment['comment'] === $currentComment && 
+                       $comment['created_at']->format('Y-m-d H:i:s') === $reviewedAt->format('Y-m-d H:i:s');
+            });
+            
+            if (!$exists) {
+                $comments->push([
+                    'comment' => $currentComment,
+                    'reviewer' => $reviewer,
+                    'created_at' => $reviewedAt,
+                    'status' => $this->{$phase . '_status'},
+                ]);
+            }
         }
-        return $comments;
+        
+        return $comments->sortByDesc('created_at');
     }
 }
