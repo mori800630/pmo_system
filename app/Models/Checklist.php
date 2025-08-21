@@ -54,6 +54,11 @@ class Checklist extends Model
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 
+    public function feedbacks()
+    {
+        return $this->hasMany(ChecklistFeedback::class);
+    }
+
     /**
      * フェーズの日本語名を取得
      */

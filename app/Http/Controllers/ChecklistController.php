@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Checklist;
 use App\Models\Project;
+use App\Models\ChecklistFeedback;
 use Illuminate\Http\Request;
 
 class ChecklistController extends Controller
@@ -149,6 +150,13 @@ class ChecklistController extends Controller
             'review_comment' => $request->input('review_comment'),
         ]);
 
+        ChecklistFeedback::create([
+            'checklist_id' => $checklist->id,
+            'reviewer_id' => auth()->id(),
+            'action' => 'approved',
+            'comment' => $request->input('review_comment'),
+        ]);
+
         return redirect()->route('projects.show', $checklist->project)
             ->with('success', '承認しました。');
     }
@@ -171,6 +179,13 @@ class ChecklistController extends Controller
             'reviewed_by' => auth()->id(),
             'reviewed_at' => now(),
             'review_comment' => $request->input('review_comment'),
+        ]);
+
+        ChecklistFeedback::create([
+            'checklist_id' => $checklist->id,
+            'reviewer_id' => auth()->id(),
+            'action' => 'rejected',
+            'comment' => $request->input('review_comment'),
         ]);
 
         return redirect()->route('projects.show', $checklist->project)

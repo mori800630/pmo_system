@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use App\Models\Checklist;
+use App\Models\ChecklistFeedback;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -209,6 +210,17 @@ class ProjectController extends Controller
                 'reviewed_at' => now(),
             ]);
 
+        // 履歴保存
+        $items = Checklist::where('project_id', $project->id)->where('phase', $phase)->get(['id']);
+        foreach ($items as $item) {
+            ChecklistFeedback::create([
+                'checklist_id' => $item->id,
+                'reviewer_id' => auth()->id(),
+                'action' => 'approved',
+                'comment' => $request->input('review_comment'),
+            ]);
+        }
+
         return redirect()->route('projects.show', $project)
             ->with('success', ucfirst($phase) . 'フェーズを承認しました。');
     }
@@ -252,6 +264,13 @@ class ProjectController extends Controller
                 $item->reviewed_by = auth()->id();
                 $item->reviewed_at = now();
                 $item->save();
+
+                ChecklistFeedback::create([
+                    'checklist_id' => $item->id,
+                    'reviewer_id' => auth()->id(),
+                    'action' => 'rejected',
+                    'comment' => $item->review_comment,
+                ]);
             }
         }
 

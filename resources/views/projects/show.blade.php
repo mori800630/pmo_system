@@ -211,14 +211,23 @@
                                     @elseif($checklist->description)
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
-                                    @if($checklist->review_comment)
-                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
-                                        <div class="text-sm text-gray-700">
-                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                            @if($checklist->reviewed_by)
-                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                    @php($feedbacks = $checklist->feedbacks()->latest()->get())
+                                    @if($feedbacks->count())
+                                    <div class="mt-2 space-y-2">
+                                        @foreach($feedbacks as $fb)
+                                        <div class="p-2 rounded-md {{ $fb->action === 'rejected' ? 'bg-red-50' : 'bg-green-50' }}">
+                                            <div class="text-xs text-gray-600">
+                                                {{ ucfirst($fb->action) }}
+                                                @if($fb->reviewer)
+                                                    ・{{ $fb->reviewer->name }}
+                                                @endif
+                                                ・{{ $fb->created_at->format('Y/m/d H:i') }}
+                                            </div>
+                                            @if($fb->comment)
+                                            <div class="text-sm text-gray-800 whitespace-pre-line">{{ $fb->comment }}</div>
                                             @endif
                                         </div>
+                                        @endforeach
                                     </div>
                                     @endif
                                 </div>
@@ -334,14 +343,23 @@
                                     @elseif($checklist->description)
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
-                                    @if($checklist->review_comment)
-                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
-                                        <div class="text-sm text-gray-700">
-                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                            @if($checklist->reviewed_by)
-                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                    @php($feedbacks = $checklist->feedbacks()->latest()->get())
+                                    @if($feedbacks->count())
+                                    <div class="mt-2 space-y-2">
+                                        @foreach($feedbacks as $fb)
+                                        <div class="p-2 rounded-md {{ $fb->action === 'rejected' ? 'bg-red-50' : 'bg-green-50' }}">
+                                            <div class="text-xs text-gray-600">
+                                                {{ ucfirst($fb->action) }}
+                                                @if($fb->reviewer)
+                                                    ・{{ $fb->reviewer->name }}
+                                                @endif
+                                                ・{{ $fb->created_at->format('Y/m/d H:i') }}
+                                            </div>
+                                            @if($fb->comment)
+                                            <div class="text-sm text-gray-800 whitespace-pre-line">{{ $fb->comment }}</div>
                                             @endif
                                         </div>
+                                        @endforeach
                                     </div>
                                     @endif
                                 </div>
@@ -457,14 +475,23 @@
                                     @elseif($checklist->description)
                                     <p class="mt-1 text-sm text-gray-500 whitespace-pre-line">{{ $checklist->description }}</p>
                                     @endif
-                                    @if($checklist->review_comment)
-                                    <div class="mt-2 p-2 bg-gray-100 rounded-md">
-                                        <div class="text-sm text-gray-700">
-                                            <strong>PMOコメント:</strong> {{ $checklist->review_comment }}
-                                            @if($checklist->reviewed_by)
-                                            <br><small>レビュー者: {{ $checklist->reviewer->name }} ({{ $checklist->reviewed_at->format('Y/m/d H:i') }})</small>
+                                    @php($feedbacks = $checklist->feedbacks()->latest()->get())
+                                    @if($feedbacks->count())
+                                    <div class="mt-2 space-y-2">
+                                        @foreach($feedbacks as $fb)
+                                        <div class="p-2 rounded-md {{ $fb->action === 'rejected' ? 'bg-red-50' : 'bg-green-50' }}">
+                                            <div class="text-xs text-gray-600">
+                                                {{ ucfirst($fb->action) }}
+                                                @if($fb->reviewer)
+                                                    ・{{ $fb->reviewer->name }}
+                                                @endif
+                                                ・{{ $fb->created_at->format('Y/m/d H:i') }}
+                                            </div>
+                                            @if($fb->comment)
+                                            <div class="text-sm text-gray-800 whitespace-pre-line">{{ $fb->comment }}</div>
                                             @endif
                                         </div>
+                                        @endforeach
                                     </div>
                                     @endif
                                 </div>
