@@ -139,7 +139,7 @@
                         </span>
                         @if($project->canEditBy(auth()->user()))
                             @if($project->planning_status === 'draft' || $project->planning_status === 'rejected')
-                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'planning']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/planning/submit" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
                             </form>
@@ -147,7 +147,7 @@
                         @endif
                         @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             @if($project->planning_status === 'submitted')
-                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'planning']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/planning/start-review" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
                             </form>
@@ -264,7 +264,7 @@
                         </span>
                         @if($project->canEditBy(auth()->user()))
                             @if($project->execution_status === 'draft' || $project->execution_status === 'rejected')
-                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'execution']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/execution/submit" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
                             </form>
@@ -272,7 +272,7 @@
                         @endif
                         @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             @if($project->execution_status === 'submitted')
-                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'execution']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/execution/start-review" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
                             </form>
@@ -389,7 +389,7 @@
                         </span>
                         @if($project->canEditBy(auth()->user()))
                             @if($project->completion_status === 'draft' || $project->completion_status === 'rejected')
-                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'completion']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/completion/submit" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
                             </form>
@@ -397,7 +397,7 @@
                         @endif
                         @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             @if($project->completion_status === 'submitted')
-                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'completion']) }}" method="POST" class="inline">
+                            <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/completion/start-review" method="POST" class="inline">
                                 @csrf
                                 <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
                             </form>
@@ -507,7 +507,7 @@
     <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">チェックリスト項目を追加</h3>
-            <form id="addChecklistForm" action="{{ route('checklists.store', $project) }}" method="POST">
+            <form id="addChecklistForm" action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/checklists" method="POST">
                 @csrf
                 <input type="hidden" name="phase" id="phase">
                 <div class="mb-4">
@@ -538,7 +538,7 @@
     <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">チェックリスト項目を編集</h3>
-            <form id="editChecklistForm" method="POST">
+            <form id="editChecklistForm" method="POST" action="">
                 @csrf
                 @method('PUT')
                 <div class="mb-4">
@@ -671,7 +671,7 @@ document.querySelectorAll('.checklist-toggle').forEach(checkbox => {
         const checklistId = this.dataset.id;
         const isChecked = this.checked;
         
-        fetch(`/checklists/${checklistId}/toggle`, {
+        fetch(`https://pmosystem-production.up.railway.app/checklists/${checklistId}/toggle`, {
             method: 'PATCH',
             headers: {
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
@@ -706,7 +706,7 @@ function hideAddForm() {
 
 // チェックリスト編集フォームを表示
 function editChecklist(id, title, description) {
-    document.getElementById('editChecklistForm').action = `/checklists/${id}`;
+    document.getElementById('editChecklistForm').action = `https://pmosystem-production.up.railway.app/checklists/${id}`;
     document.getElementById('edit_title').value = title;
     document.getElementById('edit_description').value = description;
     document.getElementById('editChecklistModal').classList.remove('hidden');
@@ -719,7 +719,7 @@ function hideEditForm() {
 
 // 承認モーダルを表示
 function showApproveModal(checklistId) {
-    document.getElementById('approveForm').action = `/checklists/${checklistId}/approve`;
+    document.getElementById('approveForm').action = `https://pmosystem-production.up.railway.app/checklists/${checklistId}/approve`;
     document.getElementById('approveModal').classList.remove('hidden');
 }
 
@@ -731,7 +731,7 @@ function hideApproveModal() {
 
 // 差戻しモーダルを表示
 function showRejectModal(checklistId) {
-    document.getElementById('rejectForm').action = `/checklists/${checklistId}/reject`;
+    document.getElementById('rejectForm').action = `https://pmosystem-production.up.railway.app/checklists/${checklistId}/reject`;
     document.getElementById('rejectModal').classList.remove('hidden');
 }
 
@@ -743,7 +743,7 @@ function hideRejectModal() {
 
 // フェーズ承認モーダルを表示
 function showPhaseApproveModal(phase) {
-    document.getElementById('phaseApproveForm').action = `/projects/{{ $project->id }}/phases/${phase}/approve`;
+    document.getElementById('phaseApproveForm').action = `https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/${phase}/approve`;
     document.getElementById('phaseApproveModal').classList.remove('hidden');
 }
 
@@ -755,7 +755,7 @@ function hidePhaseApproveModal() {
 
 // フェーズ差戻しモーダルを表示
 function showPhaseRejectModal(phase) {
-    document.getElementById('phaseRejectForm').action = `/projects/{{ $project->id }}/phases/${phase}/reject`;
+    document.getElementById('phaseRejectForm').action = `https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/${phase}/reject`;
     document.getElementById('phaseRejectModal').classList.remove('hidden');
 }
 
