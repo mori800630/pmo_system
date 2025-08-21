@@ -159,32 +159,26 @@
                         @endif
                     </div>
                 </div>
-                @if($project->planning_review_comment)
-                <div class="mt-3 p-3 bg-yellow-100 rounded-md">
-                    <div class="text-sm text-yellow-800">
-                        <strong>PMOコメント:</strong> {{ $project->planning_review_comment }}
-                        @if($project->getPhaseReviewer('planning'))
-                        <br><small>レビュー者: {{ $project->getPhaseReviewer('planning')->name }} ({{ $project->planning_reviewed_at->format('Y/m/d H:i') }})</small>
-                        @endif
+                @php
+                    $planningComments = $project->getPhaseCommentHistory('planning');
+                @endphp
+                @if($planningComments->isNotEmpty())
+                <div class="mt-3 space-y-2">
+                    @foreach($planningComments as $comment)
+                    <div class="p-3 bg-yellow-100 rounded-md">
+                        <div class="text-sm text-yellow-800">
+                            <strong>PMOコメント:</strong> {{ $comment['comment'] }}
+                            @if($comment['reviewer'])
+                            <br><small>レビュー者: {{ $comment['reviewer']->name }} ({{ $comment['created_at']->format('Y/m/d H:i') }}) - ステータス: {{ $comment['status'] }}</small>
+                            @endif
+                        </div>
                     </div>
+                    @endforeach
                 </div>
                 @endif
             </div>
             <div class="border-t border-yellow-200">
-                @php
-                    $planningCompleted = $project->planningChecklists->where('status', 'approved')->count();
-                    $planningTotal = $project->planningChecklists->count();
-                    $planningPercent = $planningTotal ? intval($planningCompleted / $planningTotal * 100) : 0;
-                @endphp
-                <div class="px-4 py-3 bg-white">
-                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
-                        <span>進捗: <span class="font-medium">{{ $planningCompleted }} / {{ $planningTotal }}</span></span>
-                        <span class="tabular-nums">{{ $planningPercent }}%</span>
-                    </div>
-                    <div class="w-full h-2 bg-gray-200 rounded">
-                        <div class="h-2 bg-yellow-400 rounded" style="width: {{ $planningPercent }}%"></div>
-                    </div>
-                </div>
+
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->planningChecklists as $checklist)
                     <li class="px-4 py-4">
@@ -296,32 +290,26 @@
                         @endif
                     </div>
                 </div>
-                @if($project->execution_review_comment)
-                <div class="mt-3 p-3 bg-blue-100 rounded-md">
-                    <div class="text-sm text-blue-800">
-                        <strong>PMOコメント:</strong> {{ $project->execution_review_comment }}
-                        @if($project->getPhaseReviewer('execution'))
-                        <br><small>レビュー者: {{ $project->getPhaseReviewer('execution')->name }} ({{ $project->execution_reviewed_at->format('Y/m/d H:i') }})</small>
-                        @endif
+                @php
+                    $executionComments = $project->getPhaseCommentHistory('execution');
+                @endphp
+                @if($executionComments->isNotEmpty())
+                <div class="mt-3 space-y-2">
+                    @foreach($executionComments as $comment)
+                    <div class="p-3 bg-blue-100 rounded-md">
+                        <div class="text-sm text-blue-800">
+                            <strong>PMOコメント:</strong> {{ $comment['comment'] }}
+                            @if($comment['reviewer'])
+                            <br><small>レビュー者: {{ $comment['reviewer']->name }} ({{ $comment['created_at']->format('Y/m/d H:i') }}) - ステータス: {{ $comment['status'] }}</small>
+                            @endif
+                        </div>
                     </div>
+                    @endforeach
                 </div>
                 @endif
             </div>
             <div class="border-t border-blue-200">
-                @php
-                    $executionCompleted = $project->executionChecklists->where('status', 'approved')->count();
-                    $executionTotal = $project->executionChecklists->count();
-                    $executionPercent = $executionTotal ? intval($executionCompleted / $executionTotal * 100) : 0;
-                @endphp
-                <div class="px-4 py-3 bg-white">
-                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
-                        <span>進捗: <span class="font-medium">{{ $executionCompleted }} / {{ $executionTotal }}</span></span>
-                        <span class="tabular-nums">{{ $executionPercent }}%</span>
-                    </div>
-                    <div class="w-full h-2 bg-gray-200 rounded">
-                        <div class="h-2 bg-blue-400 rounded" style="width: {{ $executionPercent }}%"></div>
-                    </div>
-                </div>
+
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->executionChecklists as $checklist)
                     <li class="px-4 py-4">
@@ -433,32 +421,26 @@
                         @endif
                     </div>
                 </div>
-                @if($project->completion_review_comment)
-                <div class="mt-3 p-3 bg-green-100 rounded-md">
-                    <div class="text-sm text-green-800">
-                        <strong>PMOコメント:</strong> {{ $project->completion_review_comment }}
-                        @if($project->getPhaseReviewer('completion'))
-                        <br><small>レビュー者: {{ $project->getPhaseReviewer('completion')->name }} ({{ $project->completion_reviewed_at->format('Y/m/d H:i') }})</small>
-                        @endif
+                @php
+                    $completionComments = $project->getPhaseCommentHistory('completion');
+                @endphp
+                @if($completionComments->isNotEmpty())
+                <div class="mt-3 space-y-2">
+                    @foreach($completionComments as $comment)
+                    <div class="p-3 bg-green-100 rounded-md">
+                        <div class="text-sm text-green-800">
+                            <strong>PMOコメント:</strong> {{ $comment['comment'] }}
+                            @if($comment['reviewer'])
+                            <br><small>レビュー者: {{ $comment['reviewer']->name }} ({{ $comment['created_at']->format('Y/m/d H:i') }}) - ステータス: {{ $comment['status'] }}</small>
+                            @endif
+                        </div>
                     </div>
+                    @endforeach
                 </div>
                 @endif
             </div>
             <div class="border-t border-green-200">
-                @php
-                    $completionCompleted = $project->completionChecklists->where('status', 'approved')->count();
-                    $completionTotal = $project->completionChecklists->count();
-                    $completionPercent = $completionTotal ? intval($completionCompleted / $completionTotal * 100) : 0;
-                @endphp
-                <div class="px-4 py-3 bg-white">
-                    <div class="flex items-center justify-between mb-2 text-sm text-gray-700">
-                        <span>進捗: <span class="font-medium">{{ $completionCompleted }} / {{ $completionTotal }}</span></span>
-                        <span class="tabular-nums">{{ $completionPercent }}%</span>
-                    </div>
-                    <div class="w-full h-2 bg-gray-200 rounded">
-                        <div class="h-2 bg-green-400 rounded" style="width: {{ $completionPercent }}%"></div>
-                    </div>
-                </div>
+
                 <ul class="divide-y divide-gray-200">
                     @forelse($project->completionChecklists as $checklist)
                     <li class="px-4 py-4">

@@ -224,4 +224,28 @@ class Project extends Model
         $reviewerId = $this->{$phase . '_reviewed_by'};
         return $reviewerId ? User::find($reviewerId) : null;
     }
+
+    /**
+     * フェーズのコメント履歴を取得
+     */
+    public function getPhaseCommentHistory($phase)
+    {
+        $comments = collect();
+        
+        // 現在のコメントがある場合
+        $currentComment = $this->{$phase . '_review_comment'};
+        $reviewer = $this->getPhaseReviewer($phase);
+        $reviewedAt = $this->{$phase . '_reviewed_at'};
+        
+        if ($currentComment && $reviewer && $reviewedAt) {
+            $comments->push([
+                'comment' => $currentComment,
+                'reviewer' => $reviewer,
+                'created_at' => $reviewedAt,
+                'status' => $this->{$phase . '_status'}
+            ]);
+        }
+        
+        return $comments;
+    }
 }
