@@ -276,6 +276,8 @@ class Project extends Model
             }
         }
         
+
+        
         return $comments->sortByDesc('created_at');
     }
 }

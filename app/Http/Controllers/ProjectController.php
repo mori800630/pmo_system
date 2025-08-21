@@ -214,6 +214,34 @@ class ProjectController extends Controller
         } catch (\Throwable $e) {
             // テーブル未作成時でも致命的にしない
         }
+        
+        // 既存のコメントがあれば履歴テーブルに移行（初回のみ）
+        try {
+            $existingComment = $project->{$phase . '_review_comment'};
+            $existingReviewer = $project->{$phase . '_reviewed_by'};
+            $existingReviewedAt = $project->{$phase . '_reviewed_at'};
+            
+            if ($existingComment && $existingReviewer && $existingReviewedAt) {
+                $exists = ProjectPhaseFeedback::where('project_id', $project->id)
+                    ->where('phase', $phase)
+                    ->where('comment', $existingComment)
+                    ->exists();
+                
+                if (!$exists) {
+                    ProjectPhaseFeedback::create([
+                        'project_id' => $project->id,
+                        'phase' => $phase,
+                        'reviewer_id' => $existingReviewer,
+                        'comment' => $existingComment,
+                        'status_at_feedback' => $project->{$phase . '_status'},
+                        'created_at' => $existingReviewedAt,
+                        'updated_at' => $existingReviewedAt,
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // 移行処理でエラーが発生しても致命的にしない
+        }
 
         // フェーズ配下の項目を一括承認
         Checklist::where('project_id', $project->id)
@@ -277,6 +305,34 @@ class ProjectController extends Controller
                 'status_at_feedback' => 'rejected',
             ]);
         } catch (\Throwable $e) {}
+        
+        // 既存のコメントがあれば履歴テーブルに移行（初回のみ）
+        try {
+            $existingComment = $project->{$phase . '_review_comment'};
+            $existingReviewer = $project->{$phase . '_reviewed_by'};
+            $existingReviewedAt = $project->{$phase . '_reviewed_at'};
+            
+            if ($existingComment && $existingReviewer && $existingReviewedAt) {
+                $exists = ProjectPhaseFeedback::where('project_id', $project->id)
+                    ->where('phase', $phase)
+                    ->where('comment', $existingComment)
+                    ->exists();
+                
+                if (!$exists) {
+                    ProjectPhaseFeedback::create([
+                        'project_id' => $project->id,
+                        'phase' => $phase,
+                        'reviewer_id' => $existingReviewer,
+                        'comment' => $existingComment,
+                        'status_at_feedback' => $project->{$phase . '_status'},
+                        'created_at' => $existingReviewedAt,
+                        'updated_at' => $existingReviewedAt,
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            // 移行処理でエラーが発生しても致命的にしない
+        }
 
         // 指摘された項目に差戻しと個別コメントを付与
         $ids = collect($request->input('problem_checklist_ids', []))->unique()->values();
