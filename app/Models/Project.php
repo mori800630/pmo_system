@@ -230,22 +230,40 @@ class Project extends Model
      */
     public function getPhaseCommentHistory($phase)
     {
+        // 新テーブルに履歴があればそれを返す
+        if (class_exists(\App\Models\ProjectPhaseFeedback::class)) {
+            try {
+                return ProjectPhaseFeedback::where('project_id', $this->id)
+                    ->where('phase', $phase)
+                    ->with('reviewer')
+                    ->orderByDesc('created_at')
+                    ->get()
+                    ->map(function ($row) {
+                        return [
+                            'comment' => $row->comment,
+                            'reviewer' => $row->reviewer,
+                            'created_at' => $row->created_at,
+                            'status' => $row->status_at_feedback,
+                        ];
+                    });
+            } catch (\Throwable $e) {
+                // まだテーブルがない等の状況ではフォールバック
+            }
+        }
+
+        // フォールバック: 現在の単一コメントのみ
         $comments = collect();
-        
-        // 現在のコメントがある場合
         $currentComment = $this->{$phase . '_review_comment'};
         $reviewer = $this->getPhaseReviewer($phase);
         $reviewedAt = $this->{$phase . '_reviewed_at'};
-        
         if ($currentComment && $reviewer && $reviewedAt) {
             $comments->push([
                 'comment' => $currentComment,
                 'reviewer' => $reviewer,
                 'created_at' => $reviewedAt,
-                'status' => $this->{$phase . '_status'}
+                'status' => $this->{$phase . '_status'},
             ]);
         }
-        
         return $comments;
     }
 }

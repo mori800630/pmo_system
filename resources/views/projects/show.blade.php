@@ -231,7 +231,7 @@
                                     @endif
                                 </div>
                             </div>
-                            @if($project->canEditBy(auth()->user()))
+                            @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
@@ -362,7 +362,7 @@
                                     @endif
                                 </div>
                             </div>
-                            @if($project->canEditBy(auth()->user()))
+                            @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf
@@ -493,7 +493,7 @@
                                     @endif
                                 </div>
                             </div>
-                            @if($project->canEditBy(auth()->user()))
+                            @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
                             <div class="ml-4">
                                 <form action="https://pmosystem-production.up.railway.app/checklists/{{ $checklist->id }}" method="POST" class="inline">
                                     @csrf

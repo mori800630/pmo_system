@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Project;
 use App\Models\Checklist;
 use App\Models\ChecklistFeedback;
+use App\Models\ProjectPhaseFeedback;
 use Illuminate\Http\Request;
 
 class ProjectController extends Controller
@@ -201,6 +202,19 @@ class ProjectController extends Controller
             $reviewCommentField => $request->input('review_comment'),
         ]);
 
+        // フェーズコメント履歴保存（承認）
+        try {
+            ProjectPhaseFeedback::create([
+                'project_id' => $project->id,
+                'phase' => $phase,
+                'reviewer_id' => auth()->id(),
+                'comment' => $request->input('review_comment'),
+                'status_at_feedback' => 'approved',
+            ]);
+        } catch (\Throwable $e) {
+            // テーブル未作成時でも致命的にしない
+        }
+
         // フェーズ配下の項目を一括承認
         Checklist::where('project_id', $project->id)
             ->where('phase', $phase)
@@ -252,6 +266,17 @@ class ProjectController extends Controller
             $reviewedAtField => now(),
             $reviewCommentField => $request->input('review_comment'),
         ]);
+
+        // フェーズコメント履歴保存（差戻し）
+        try {
+            ProjectPhaseFeedback::create([
+                'project_id' => $project->id,
+                'phase' => $phase,
+                'reviewer_id' => auth()->id(),
+                'comment' => $request->input('review_comment'),
+                'status_at_feedback' => 'rejected',
+            ]);
+        } catch (\Throwable $e) {}
 
         // 指摘された項目に差戻しと個別コメントを付与
         $ids = collect($request->input('problem_checklist_ids', []))->unique()->values();
