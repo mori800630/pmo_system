@@ -53,6 +53,7 @@ class ProjectController extends Controller
             $data['main_links'] = array_filter($data['main_links']); // 空の値を削除
         }
 
+        $data['created_by'] = auth()->id();
         $project = Project::create($data);
 
         // デフォルトのチェックリスト項目を作成
@@ -79,6 +80,10 @@ class ProjectController extends Controller
      */
     public function edit(Project $project)
     {
+        if (!$project->canEditBy(auth()->user())) {
+            abort(403, 'このプロジェクトを編集する権限がありません。');
+        }
+        
         return view('projects.edit', compact('project'));
     }
 
@@ -87,6 +92,10 @@ class ProjectController extends Controller
      */
     public function update(Request $request, Project $project)
     {
+        if (!$project->canEditBy(auth()->user())) {
+            abort(403, 'このプロジェクトを編集する権限がありません。');
+        }
+        
         $request->validate([
             'name' => 'required|string|max:255',
             'pm_name' => 'required|string|max:255',
@@ -121,6 +130,10 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
+        if (!$project->canEditBy(auth()->user())) {
+            abort(403, 'このプロジェクトを削除する権限がありません。');
+        }
+        
         $project->delete();
 
         return redirect()->route('projects.index')

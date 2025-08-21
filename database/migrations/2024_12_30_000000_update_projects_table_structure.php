@@ -12,11 +12,33 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // SQLite対応: 先にユニークインデックスを安全に削除
+        if (Schema::hasColumn('projects', 'code')) {
+            try {
+                Schema::table('projects', function (Blueprint $table) {
+                    $table->dropUnique('projects_code_unique');
+                });
+            } catch (\Throwable $e) {
+                // 存在しない場合などは無視
+            }
+        }
+
+        // 既存のカラムを安全に削除（存在するもののみ）
         Schema::table('projects', function (Blueprint $table) {
-            // 既存のカラムを削除
-            $table->dropColumn(['code', 'description', 'status', 'start_date', 'end_date']);
-            
-            // 新しいカラムを追加（nullableで追加）
+            $columns = ['code', 'description', 'status', 'start_date', 'end_date'];
+            $toDrop = [];
+            foreach ($columns as $col) {
+                if (Schema::hasColumn('projects', $col)) {
+                    $toDrop[] = $col;
+                }
+            }
+            if (!empty($toDrop)) {
+                $table->dropColumn($toDrop);
+            }
+        });
+
+        // 新しいカラムを追加（nullableで追加）
+        Schema::table('projects', function (Blueprint $table) {
             $table->string('health')->nullable()->after('pm_name'); // 進捗ヘルス
             $table->string('customer_name')->nullable()->after('health'); // 顧客名
             $table->string('priority')->nullable()->after('customer_name'); // 優先度

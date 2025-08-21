@@ -13,16 +13,22 @@
                     <p class="mt-1 max-w-2xl text-sm text-gray-500">顧客: {{ $project->customer_name }}</p>
                 </div>
                 <div class="flex space-x-3">
-                    <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                        編集
-                    </a>
-                    <form action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick="return confirm('本当に削除しますか？')">
-                            削除
-                        </button>
-                    </form>
+                    @if($project->canEditBy(auth()->user()))
+                        <a href="{{ route('projects.edit', $project) }}" class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                            編集
+                        </a>
+                        <form action="{{ route('projects.destroy', $project) }}" method="POST" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" onclick="return confirm('本当に削除しますか？')">
+                                削除
+                            </button>
+                        </form>
+                    @else
+                        <span class="inline-flex items-center px-3 py-2 text-sm text-gray-500">
+                            閲覧のみ
+                        </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -176,16 +182,8 @@
                                     </form>
                                     @endif
                                     @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="">
-                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    </form>
-                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="修正してください">
-                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    </form>
+                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
@@ -270,16 +268,8 @@
                                     </form>
                                     @endif
                                     @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="">
-                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    </form>
-                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="修正してください">
-                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    </form>
+                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
@@ -364,16 +354,8 @@
                                     </form>
                                     @endif
                                     @if($checklist->status === 'under_review' || $checklist->status === 'submitted')
-                                    <form action="{{ route('checklists.approve', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="">
-                                        <button type="submit" class="text-green-700 hover:text-green-900 text-sm">承認</button>
-                                    </form>
-                                    <form action="{{ route('checklists.reject', $checklist) }}" method="POST" class="inline">
-                                        @csrf
-                                        <input type="hidden" name="review_comment" value="修正してください">
-                                        <button type="submit" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
-                                    </form>
+                                    <button onclick="showApproveModal({{ $checklist->id }})" class="text-green-700 hover:text-green-900 text-sm">承認</button>
+                                    <button onclick="showRejectModal({{ $checklist->id }})" class="text-red-700 hover:text-red-900 text-sm">差戻し</button>
                                     @endif
                                 @endif
                                 <form action="{{ route('checklists.destroy', $checklist) }}" method="POST" class="inline">
@@ -408,7 +390,7 @@
     <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
         <div class="mt-3">
             <h3 class="text-lg font-medium text-gray-900 mb-4">チェックリスト項目を追加</h3>
-            <form id="addChecklistForm" action="https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/checklists" method="POST">
+            <form id="addChecklistForm" action="{{ route('checklists.store', $project) }}" method="POST">
                 @csrf
                 <input type="hidden" name="phase" id="phase">
                 <div class="mb-4">
@@ -458,6 +440,56 @@
                     </button>
                     <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                         更新
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 承認モーダル -->
+<div id="approveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">承認</h3>
+            <form id="approveForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="approve_comment" class="block text-sm font-medium text-gray-700">コメント（任意）</label>
+                    <textarea name="review_comment" id="approve_comment" rows="4"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="承認コメントを入力してください"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideApproveModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        承認
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 差戻しモーダル -->
+<div id="rejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">差戻し</h3>
+            <form id="rejectForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="reject_comment" class="block text-sm font-medium text-gray-700">コメント *</label>
+                    <textarea name="review_comment" id="reject_comment" rows="4" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="差戻し理由を入力してください"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hideRejectModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        差戻し
                     </button>
                 </div>
             </form>
@@ -516,6 +548,30 @@ function editChecklist(id, title, description) {
 // チェックリスト編集フォームを非表示
 function hideEditForm() {
     document.getElementById('editChecklistModal').classList.add('hidden');
+}
+
+// 承認モーダルを表示
+function showApproveModal(checklistId) {
+    document.getElementById('approveForm').action = `/checklists/${checklistId}/approve`;
+    document.getElementById('approveModal').classList.remove('hidden');
+}
+
+// 承認モーダルを非表示
+function hideApproveModal() {
+    document.getElementById('approveModal').classList.add('hidden');
+    document.getElementById('approveForm').reset();
+}
+
+// 差戻しモーダルを表示
+function showRejectModal(checklistId) {
+    document.getElementById('rejectForm').action = `/checklists/${checklistId}/reject`;
+    document.getElementById('rejectModal').classList.remove('hidden');
+}
+
+// 差戻しモーダルを非表示
+function hideRejectModal() {
+    document.getElementById('rejectModal').classList.add('hidden');
+    document.getElementById('rejectForm').reset();
 }
 </script>
 @endsection

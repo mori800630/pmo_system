@@ -23,6 +23,7 @@ class Project extends Model
         'actual_end_date',
         'deliverables_summary',
         'main_links',
+        'created_by',
     ];
 
     protected $casts = [
@@ -136,5 +137,29 @@ class Project extends Model
             'Medium' => 'bg-yellow-100 text-yellow-800',
             'Low' => 'bg-green-100 text-green-800',
         ][$this->priority] ?? 'bg-gray-100 text-gray-800';
+    }
+
+    /**
+     * プロジェクト作成者を取得
+     */
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * 現在のユーザーが編集可能かどうかを判定
+     */
+    public function canEditBy($user)
+    {
+        if (!$user) return false;
+        
+        // AdminとPMO Managerは全プロジェクト編集可能
+        if ($user->isAdmin() || $user->isPmoManager()) {
+            return true;
+        }
+        
+        // User（PM）は自分が作成したプロジェクトのみ編集可能
+        return $user->isUser() && $this->created_by === $user->id;
     }
 }
