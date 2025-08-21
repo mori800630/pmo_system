@@ -200,6 +200,15 @@ class ProjectController extends Controller
             $reviewCommentField => $request->input('review_comment'),
         ]);
 
+        // フェーズ配下の項目を一括承認
+        Checklist::where('project_id', $project->id)
+            ->where('phase', $phase)
+            ->update([
+                'status' => 'approved',
+                'reviewed_by' => auth()->id(),
+                'reviewed_at' => now(),
+            ]);
+
         return redirect()->route('projects.show', $project)
             ->with('success', ucfirst($phase) . 'フェーズを承認しました。');
     }
@@ -215,6 +224,9 @@ class ProjectController extends Controller
 
         $request->validate([
             'review_comment' => 'required|string',
+            'problem_checklist_ids' => 'nullable|array',
+            'problem_checklist_ids.*' => 'integer|exists:checklists,id',
+            'problem_comments' => 'nullable|array',
         ]);
 
         $statusField = $phase . '_status';
@@ -228,6 +240,20 @@ class ProjectController extends Controller
             $reviewedAtField => now(),
             $reviewCommentField => $request->input('review_comment'),
         ]);
+
+        // 指摘された項目に差戻しと個別コメントを付与
+        $ids = collect($request->input('problem_checklist_ids', []))->unique()->values();
+        $comments = $request->input('problem_comments', []);
+        if ($ids->count() > 0) {
+            $items = Checklist::whereIn('id', $ids)->get();
+            foreach ($items as $item) {
+                $item->status = 'rejected';
+                $item->review_comment = $comments[$item->id] ?? $request->input('review_comment');
+                $item->reviewed_by = auth()->id();
+                $item->reviewed_at = now();
+                $item->save();
+            }
+        }
 
         return redirect()->route('projects.show', $project)
             ->with('success', ucfirst($phase) . 'フェーズを差戻しました。');

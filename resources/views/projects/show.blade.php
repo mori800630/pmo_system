@@ -172,7 +172,7 @@
             </div>
             <div class="border-t border-yellow-200">
                 @php
-                    $planningCompleted = $project->planningChecklists->where('is_completed', true)->count();
+                    $planningCompleted = $project->planningChecklists->where('status', 'approved')->count();
                     $planningTotal = $project->planningChecklists->count();
                     $planningPercent = $planningTotal ? intval($planningCompleted / $planningTotal * 100) : 0;
                 @endphp
@@ -189,14 +189,10 @@
                     @forelse($project->planningChecklists as $checklist)
                     <li class="px-4 py-4">
                         <div class="flex items-start justify-between">
-                            <div class="flex items-start flex-1">
-                                <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
-                                       data-id="{{ $checklist->id }}"
-                                       {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <div class="ml-3 flex-1">
+                            <div class="flex-1">
+                                <div class="flex-1">
                                     <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                        <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
@@ -299,7 +295,7 @@
             </div>
             <div class="border-t border-blue-200">
                 @php
-                    $executionCompleted = $project->executionChecklists->where('is_completed', true)->count();
+                    $executionCompleted = $project->executionChecklists->where('status', 'approved')->count();
                     $executionTotal = $project->executionChecklists->count();
                     $executionPercent = $executionTotal ? intval($executionCompleted / $executionTotal * 100) : 0;
                 @endphp
@@ -316,14 +312,10 @@
                     @forelse($project->executionChecklists as $checklist)
                     <li class="px-4 py-4">
                         <div class="flex items-start justify-between">
-                            <div class="flex items-start flex-1">
-                                <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
-                                       data-id="{{ $checklist->id }}"
-                                       {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <div class="ml-3 flex-1">
+                            <div class="flex-1">
+                                <div class="flex-1">
                                     <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                        <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
@@ -426,7 +418,7 @@
             </div>
             <div class="border-t border-green-200">
                 @php
-                    $completionCompleted = $project->completionChecklists->where('is_completed', true)->count();
+                    $completionCompleted = $project->completionChecklists->where('status', 'approved')->count();
                     $completionTotal = $project->completionChecklists->count();
                     $completionPercent = $completionTotal ? intval($completionCompleted / $completionTotal * 100) : 0;
                 @endphp
@@ -443,14 +435,10 @@
                     @forelse($project->completionChecklists as $checklist)
                     <li class="px-4 py-4">
                         <div class="flex items-start justify-between">
-                            <div class="flex items-start flex-1">
-                                <input type="checkbox" 
-                                       class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded checklist-toggle mt-1"
-                                       data-id="{{ $checklist->id }}"
-                                       {{ $checklist->is_completed ? 'checked' : '' }}>
-                                <div class="ml-3 flex-1">
+                            <div class="flex-1">
+                                <div class="flex-1">
                                     <div class="flex items-center">
-                                        <span class="text-sm font-medium text-gray-900 {{ $checklist->is_completed ? 'line-through text-gray-500' : '' }}">
+                                        <span class="text-sm font-medium text-gray-900">
                                             {{ $checklist->title }}
                                         </span>
                                         <span class="ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $checklist->status_color_class }}">
@@ -609,6 +597,44 @@
                     <textarea name="review_comment" id="phase_reject_comment" rows="4" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="差戻し理由を入力してください"></textarea>
                 </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">問題のあった項目（複数選択可）</label>
+                    <div class="mt-2 space-y-4">
+                        <div id="problem-items-planning" class="max-h-60 overflow-y-auto border rounded-md p-3 bg-gray-50 hidden">
+                            @foreach($project->planningChecklists as $cl)
+                            <div class="mb-2">
+                                <label class="flex items-start space-x-2 text-sm text-gray-700">
+                                    <input type="checkbox" name="problem_checklist_ids[]" value="{{ $cl->id }}" class="mt-1 problem-checkbox" data-target="problem-comment-{{ $cl->id }}">
+                                    <span class="flex-1">{{ $cl->title }}</span>
+                                </label>
+                                <textarea id="problem-comment-{{ $cl->id }}" name="problem_comments[{{ $cl->id }}]" rows="2" class="mt-1 w-full border border-gray-300 rounded-md text-sm p-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="指摘内容を入力..." disabled></textarea>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div id="problem-items-execution" class="max-h-60 overflow-y-auto border rounded-md p-3 bg-gray-50 hidden">
+                            @foreach($project->executionChecklists as $cl)
+                            <div class="mb-2">
+                                <label class="flex items-start space-x-2 text-sm text-gray-700">
+                                    <input type="checkbox" name="problem_checklist_ids[]" value="{{ $cl->id }}" class="mt-1 problem-checkbox" data-target="problem-comment-{{ $cl->id }}">
+                                    <span class="flex-1">{{ $cl->title }}</span>
+                                </label>
+                                <textarea id="problem-comment-{{ $cl->id }}" name="problem_comments[{{ $cl->id }}]" rows="2" class="mt-1 w-full border border-gray-300 rounded-md text-sm p-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="指摘内容を入力..." disabled></textarea>
+                            </div>
+                            @endforeach
+                        </div>
+                        <div id="problem-items-completion" class="max-h-60 overflow-y-auto border rounded-md p-3 bg-gray-50 hidden">
+                            @foreach($project->completionChecklists as $cl)
+                            <div class="mb-2">
+                                <label class="flex items-start space-x-2 text-sm text-gray-700">
+                                    <input type="checkbox" name="problem_checklist_ids[]" value="{{ $cl->id }}" class="mt-1 problem-checkbox" data-target="problem-comment-{{ $cl->id }}">
+                                    <span class="flex-1">{{ $cl->title }}</span>
+                                </label>
+                                <textarea id="problem-comment-{{ $cl->id }}" name="problem_comments[{{ $cl->id }}]" rows="2" class="mt-1 w-full border border-gray-300 rounded-md text-sm p-2 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent" placeholder="指摘内容を入力..." disabled></textarea>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
                 <div class="flex justify-end space-x-3">
                     <button type="button" onclick="hidePhaseRejectModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
                         キャンセル
@@ -624,31 +650,7 @@
 
 <script>
 // チェックリストの完了状態を切り替え
-document.querySelectorAll('.checklist-toggle').forEach(checkbox => {
-    checkbox.addEventListener('change', function() {
-        const checklistId = this.dataset.id;
-        const isChecked = this.checked;
-        
-        fetch(`https://pmosystem-production.up.railway.app/checklists/${checklistId}/toggle`, {
-            method: 'PATCH',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const titleSpan = this.closest('li').querySelector('span');
-                if (data.is_completed) {
-                    titleSpan.classList.add('line-through', 'text-gray-500');
-                } else {
-                    titleSpan.classList.remove('line-through', 'text-gray-500');
-                }
-            }
-        });
-    });
-});
+// 旧: チェックボックスによる完了切替は廃止
 
 // チェックリスト追加フォームを表示
 function showAddForm(phase) {
@@ -693,6 +695,25 @@ function hidePhaseApproveModal() {
 function showPhaseRejectModal(phase) {
     document.getElementById('phaseRejectForm').action = `https://pmosystem-production.up.railway.app/projects/{{ $project->id }}/phases/${phase}/reject`;
     document.getElementById('phaseRejectModal').classList.remove('hidden');
+    // 表示するチェックリスト群を切り替え
+    document.getElementById('problem-items-planning').classList.add('hidden');
+    document.getElementById('problem-items-execution').classList.add('hidden');
+    document.getElementById('problem-items-completion').classList.add('hidden');
+    if (phase === 'planning') {
+        document.getElementById('problem-items-planning').classList.remove('hidden');
+    } else if (phase === 'execution') {
+        document.getElementById('problem-items-execution').classList.remove('hidden');
+    } else if (phase === 'completion') {
+        document.getElementById('problem-items-completion').classList.remove('hidden');
+    }
+    // チェック状態に応じてコメント入力の有効化
+    document.querySelectorAll('#phaseRejectModal .problem-checkbox').forEach(cb => {
+        const targetId = cb.getAttribute('data-target');
+        const textarea = document.getElementById(targetId);
+        const toggle = () => { textarea.disabled = !cb.checked; };
+        cb.addEventListener('change', toggle);
+        toggle();
+    });
 }
 
 // フェーズ差戻しモーダルを非表示
