@@ -128,8 +128,47 @@
         <!-- 計画フェーズ -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6 bg-yellow-50">
-                <h3 class="text-lg leading-6 font-medium text-yellow-900">計画フェーズ</h3>
-                <p class="mt-1 max-w-2xl text-sm text-yellow-700">プロジェクトの立ち上げと計画策定（プロジェクト内容の理解、体制確認、スケジュール策定、リスク分析など）</p>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-yellow-900">計画フェーズ</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-yellow-700">プロジェクトの立ち上げと計画策定（プロジェクト内容の理解、体制確認、スケジュール策定、リスク分析など）</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->getPhaseStatusColorClass('planning') }}">
+                            {{ $project->getPhaseStatusName('planning') }}
+                        </span>
+                        @if($project->canEditBy(auth()->user()))
+                            @if($project->planning_status === 'draft' || $project->planning_status === 'rejected')
+                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'planning']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                            </form>
+                            @endif
+                        @endif
+                        @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                            @if($project->planning_status === 'submitted')
+                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'planning']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
+                            </form>
+                            @endif
+                            @if($project->planning_status === 'under_review' || $project->planning_status === 'submitted')
+                            <button onclick="showPhaseApproveModal('planning')" class="text-green-700 hover:text-green-900 text-sm font-medium">承認</button>
+                            <button onclick="showPhaseRejectModal('planning')" class="text-red-700 hover:text-red-900 text-sm font-medium">差戻し</button>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                @if($project->planning_review_comment)
+                <div class="mt-3 p-3 bg-yellow-100 rounded-md">
+                    <div class="text-sm text-yellow-800">
+                        <strong>PMOコメント:</strong> {{ $project->planning_review_comment }}
+                        @if($project->getPhaseReviewer('planning'))
+                        <br><small>レビュー者: {{ $project->getPhaseReviewer('planning')->name }} ({{ $project->planning_reviewed_at->format('Y/m/d H:i') }})</small>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="border-t border-yellow-200">
                 @php
@@ -214,8 +253,47 @@
         <!-- 実行フェーズ -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6 bg-blue-50">
-                <h3 class="text-lg leading-6 font-medium text-blue-900">実行フェーズ</h3>
-                <p class="mt-1 max-w-2xl text-sm text-blue-700">プロジェクトの実行・監視（キックオフ、課題管理、進捗管理、品質管理など）</p>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-blue-900">実行フェーズ</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-blue-700">プロジェクトの実行・監視（キックオフ、課題管理、進捗管理、品質管理など）</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->getPhaseStatusColorClass('execution') }}">
+                            {{ $project->getPhaseStatusName('execution') }}
+                        </span>
+                        @if($project->canEditBy(auth()->user()))
+                            @if($project->execution_status === 'draft' || $project->execution_status === 'rejected')
+                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'execution']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                            </form>
+                            @endif
+                        @endif
+                        @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                            @if($project->execution_status === 'submitted')
+                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'execution']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
+                            </form>
+                            @endif
+                            @if($project->execution_status === 'under_review' || $project->execution_status === 'submitted')
+                            <button onclick="showPhaseApproveModal('execution')" class="text-green-700 hover:text-green-900 text-sm font-medium">承認</button>
+                            <button onclick="showPhaseRejectModal('execution')" class="text-red-700 hover:text-red-900 text-sm font-medium">差戻し</button>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                @if($project->execution_review_comment)
+                <div class="mt-3 p-3 bg-blue-100 rounded-md">
+                    <div class="text-sm text-blue-800">
+                        <strong>PMOコメント:</strong> {{ $project->execution_review_comment }}
+                        @if($project->getPhaseReviewer('execution'))
+                        <br><small>レビュー者: {{ $project->getPhaseReviewer('execution')->name }} ({{ $project->execution_reviewed_at->format('Y/m/d H:i') }})</small>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="border-t border-blue-200">
                 @php
@@ -300,8 +378,47 @@
         <!-- 終結フェーズ -->
         <div class="bg-white shadow overflow-hidden sm:rounded-lg">
             <div class="px-4 py-5 sm:px-6 bg-green-50">
-                <h3 class="text-lg leading-6 font-medium text-green-900">終結フェーズ</h3>
-                <p class="mt-1 max-w-2xl text-sm text-green-700">プロジェクトの終結（成果物確認、結果評価、ポストモーテム実施など）</p>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-lg leading-6 font-medium text-green-900">終結フェーズ</h3>
+                        <p class="mt-1 max-w-2xl text-sm text-green-700">プロジェクトの終結（成果物確認、結果評価、ポストモーテム実施など）</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $project->getPhaseStatusColorClass('completion') }}">
+                            {{ $project->getPhaseStatusName('completion') }}
+                        </span>
+                        @if($project->canEditBy(auth()->user()))
+                            @if($project->completion_status === 'draft' || $project->completion_status === 'rejected')
+                            <form action="{{ route('projects.phases.submit', ['project' => $project, 'phase' => 'completion']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-blue-600 hover:text-blue-900 text-sm font-medium">フェーズ提出</button>
+                            </form>
+                            @endif
+                        @endif
+                        @if(auth()->user()->isPmoManager() || auth()->user()->isAdmin())
+                            @if($project->completion_status === 'submitted')
+                            <form action="{{ route('projects.phases.startReview', ['project' => $project, 'phase' => 'completion']) }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="text-yellow-700 hover:text-yellow-900 text-sm font-medium">レビュー開始</button>
+                            </form>
+                            @endif
+                            @if($project->completion_status === 'under_review' || $project->completion_status === 'submitted')
+                            <button onclick="showPhaseApproveModal('completion')" class="text-green-700 hover:text-green-900 text-sm font-medium">承認</button>
+                            <button onclick="showPhaseRejectModal('completion')" class="text-red-700 hover:text-red-900 text-sm font-medium">差戻し</button>
+                            @endif
+                        @endif
+                    </div>
+                </div>
+                @if($project->completion_review_comment)
+                <div class="mt-3 p-3 bg-green-100 rounded-md">
+                    <div class="text-sm text-green-800">
+                        <strong>PMOコメント:</strong> {{ $project->completion_review_comment }}
+                        @if($project->getPhaseReviewer('completion'))
+                        <br><small>レビュー者: {{ $project->getPhaseReviewer('completion')->name }} ({{ $project->completion_reviewed_at->format('Y/m/d H:i') }})</small>
+                        @endif
+                    </div>
+                </div>
+                @endif
             </div>
             <div class="border-t border-green-200">
                 @php
@@ -497,6 +614,56 @@
     </div>
 </div>
 
+<!-- フェーズ承認モーダル -->
+<div id="phaseApproveModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">フェーズ承認</h3>
+            <form id="phaseApproveForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="phase_approve_comment" class="block text-sm font-medium text-gray-700">コメント（任意）</label>
+                    <textarea name="review_comment" id="phase_approve_comment" rows="4"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="承認コメントを入力してください"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hidePhaseApproveModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+                        承認
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- フェーズ差戻しモーダル -->
+<div id="phaseRejectModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden">
+    <div class="relative top-10 mx-auto p-5 border w-3/4 max-w-2xl shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+            <h3 class="text-lg font-medium text-gray-900 mb-4">フェーズ差戻し</h3>
+            <form id="phaseRejectForm" method="POST">
+                @csrf
+                <div class="mb-4">
+                    <label for="phase_reject_comment" class="block text-sm font-medium text-gray-700">コメント *</label>
+                    <textarea name="review_comment" id="phase_reject_comment" rows="4" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm resize-y" placeholder="差戻し理由を入力してください"></textarea>
+                </div>
+                <div class="flex justify-end space-x-3">
+                    <button type="button" onclick="hidePhaseRejectModal()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded">
+                        キャンセル
+                    </button>
+                    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                        差戻し
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
 // チェックリストの完了状態を切り替え
 document.querySelectorAll('.checklist-toggle').forEach(checkbox => {
@@ -572,6 +739,30 @@ function showRejectModal(checklistId) {
 function hideRejectModal() {
     document.getElementById('rejectModal').classList.add('hidden');
     document.getElementById('rejectForm').reset();
+}
+
+// フェーズ承認モーダルを表示
+function showPhaseApproveModal(phase) {
+    document.getElementById('phaseApproveForm').action = `/projects/{{ $project->id }}/phases/${phase}/approve`;
+    document.getElementById('phaseApproveModal').classList.remove('hidden');
+}
+
+// フェーズ承認モーダルを非表示
+function hidePhaseApproveModal() {
+    document.getElementById('phaseApproveModal').classList.add('hidden');
+    document.getElementById('phaseApproveForm').reset();
+}
+
+// フェーズ差戻しモーダルを表示
+function showPhaseRejectModal(phase) {
+    document.getElementById('phaseRejectForm').action = `/projects/{{ $project->id }}/phases/${phase}/reject`;
+    document.getElementById('phaseRejectModal').classList.remove('hidden');
+}
+
+// フェーズ差戻しモーダルを非表示
+function hidePhaseRejectModal() {
+    document.getElementById('phaseRejectModal').classList.add('hidden');
+    document.getElementById('phaseRejectForm').reset();
 }
 </script>
 @endsection

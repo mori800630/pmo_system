@@ -24,6 +24,12 @@ class Project extends Model
         'deliverables_summary',
         'main_links',
         'created_by',
+        'planning_status', 'planning_submitted_by', 'planning_submitted_at',
+        'planning_reviewed_by', 'planning_reviewed_at', 'planning_review_comment',
+        'execution_status', 'execution_submitted_by', 'execution_submitted_at',
+        'execution_reviewed_by', 'execution_reviewed_at', 'execution_review_comment',
+        'completion_status', 'completion_submitted_by', 'completion_submitted_at',
+        'completion_reviewed_by', 'completion_reviewed_at', 'completion_review_comment',
     ];
 
     protected $casts = [
@@ -33,6 +39,12 @@ class Project extends Model
         'actual_end_date' => 'date',
         'budget' => 'decimal:2',
         'main_links' => 'array',
+        'planning_submitted_at' => 'datetime',
+        'planning_reviewed_at' => 'datetime',
+        'execution_submitted_at' => 'datetime',
+        'execution_reviewed_at' => 'datetime',
+        'completion_submitted_at' => 'datetime',
+        'completion_reviewed_at' => 'datetime',
     ];
 
     /**
@@ -161,5 +173,55 @@ class Project extends Model
         
         // User（PM）は自分が作成したプロジェクトのみ編集可能
         return $user->isUser() && $this->created_by === $user->id;
+    }
+
+    /**
+     * フェーズのステータス名を取得
+     */
+    public function getPhaseStatusName($phase)
+    {
+        $status = $this->{$phase . '_status'};
+        return match($status) {
+            'draft' => '下書き',
+            'submitted' => '提出済み',
+            'under_review' => 'レビュー中',
+            'approved' => '承認',
+            'rejected' => '差戻し',
+            default => $status,
+        };
+    }
+
+    /**
+     * フェーズのステータス色クラスを取得
+     */
+    public function getPhaseStatusColorClass($phase)
+    {
+        $status = $this->{$phase . '_status'};
+        return match($status) {
+            'draft' => 'bg-gray-100 text-gray-800',
+            'submitted' => 'bg-blue-100 text-blue-800',
+            'under_review' => 'bg-yellow-100 text-yellow-800',
+            'approved' => 'bg-green-100 text-green-800',
+            'rejected' => 'bg-red-100 text-red-800',
+            default => 'bg-gray-100 text-gray-800',
+        };
+    }
+
+    /**
+     * フェーズの提出者を取得
+     */
+    public function getPhaseSubmitter($phase)
+    {
+        $submitterId = $this->{$phase . '_submitted_by'};
+        return $submitterId ? User::find($submitterId) : null;
+    }
+
+    /**
+     * フェーズのレビュー者を取得
+     */
+    public function getPhaseReviewer($phase)
+    {
+        $reviewerId = $this->{$phase . '_reviewed_by'};
+        return $reviewerId ? User::find($reviewerId) : null;
     }
 }

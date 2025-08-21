@@ -141,6 +141,99 @@ class ProjectController extends Controller
     }
 
     /**
+     * フェーズを提出
+     */
+    public function submitPhase(Request $request, Project $project, $phase)
+    {
+        if (!$project->canEditBy(auth()->user())) {
+            abort(403, 'このプロジェクトを編集する権限がありません。');
+        }
+
+        $statusField = $phase . '_status';
+        $submittedByField = $phase . '_submitted_by';
+        $submittedAtField = $phase . '_submitted_at';
+
+        $project->update([
+            $statusField => 'submitted',
+            $submittedByField => auth()->id(),
+            $submittedAtField => now(),
+        ]);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', ucfirst($phase) . 'フェーズを提出しました。');
+    }
+
+    /**
+     * フェーズのレビュー開始
+     */
+    public function startPhaseReview(Request $request, Project $project, $phase)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $statusField = $phase . '_status';
+        $project->update([$statusField => 'under_review']);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', ucfirst($phase) . 'フェーズのレビューを開始しました。');
+    }
+
+    /**
+     * フェーズを承認
+     */
+    public function approvePhase(Request $request, Project $project, $phase)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $statusField = $phase . '_status';
+        $reviewedByField = $phase . '_reviewed_by';
+        $reviewedAtField = $phase . '_reviewed_at';
+        $reviewCommentField = $phase . '_review_comment';
+
+        $project->update([
+            $statusField => 'approved',
+            $reviewedByField => auth()->id(),
+            $reviewedAtField => now(),
+            $reviewCommentField => $request->input('review_comment'),
+        ]);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', ucfirst($phase) . 'フェーズを承認しました。');
+    }
+
+    /**
+     * フェーズを差戻し
+     */
+    public function rejectPhase(Request $request, Project $project, $phase)
+    {
+        if (!auth()->user()->isPmoManager() && !auth()->user()->isAdmin()) {
+            abort(403);
+        }
+
+        $request->validate([
+            'review_comment' => 'required|string',
+        ]);
+
+        $statusField = $phase . '_status';
+        $reviewedByField = $phase . '_reviewed_by';
+        $reviewedAtField = $phase . '_reviewed_at';
+        $reviewCommentField = $phase . '_review_comment';
+
+        $project->update([
+            $statusField => 'rejected',
+            $reviewedByField => auth()->id(),
+            $reviewedAtField => now(),
+            $reviewCommentField => $request->input('review_comment'),
+        ]);
+
+        return redirect()->route('projects.show', $project)
+            ->with('success', ucfirst($phase) . 'フェーズを差戻しました。');
+    }
+
+    /**
      * デフォルトのチェックリスト項目を作成
      */
     private function createDefaultChecklists(Project $project)

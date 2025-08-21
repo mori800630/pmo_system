@@ -21,6 +21,12 @@ Route::middleware('auth')->group(function () {
     // プロジェクト関連のルート
     Route::resource('projects', ProjectController::class);
     
+    // フェーズ単位ワークフロールート
+    Route::post('/projects/{project}/phases/{phase}/submit', [ProjectController::class, 'submitPhase'])->name('projects.phases.submit');
+    Route::post('/projects/{project}/phases/{phase}/start-review', [ProjectController::class, 'startPhaseReview'])->name('projects.phases.startReview');
+    Route::post('/projects/{project}/phases/{phase}/approve', [ProjectController::class, 'approvePhase'])->name('projects.phases.approve');
+    Route::post('/projects/{project}/phases/{phase}/reject', [ProjectController::class, 'rejectPhase'])->name('projects.phases.reject');
+    
     // チェックリスト関連のルート
     Route::patch('/checklists/{checklist}/toggle', [ChecklistController::class, 'toggle'])->name('checklists.toggle');
     Route::post('/projects/{project}/checklists', [ChecklistController::class, 'store'])->name('checklists.store');
